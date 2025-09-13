@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Truck, ShieldCheck, Globe } from "lucide-react";
 
 export default function Hero() {
@@ -7,12 +7,7 @@ export default function Hero() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
-  const [animate, setAnimate] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setAnimate(true), 50);
-    return () => clearTimeout(timer);
-  }, []);
+  const animate = true; // Animationen werden sofort aktiviert
 
   return (
     <section id="hero" className="relative overflow-hidden bg-gray-950 text-white">
