@@ -1,0 +1,159 @@
+@import "tailwindcss";
+@tailwind "utilities";
+@tailwind "base";
+@tailwind "components";
+/* ===============================
+   Global Design Tokens
+   =============================== */
+:root {
+  /* Typo & Baseline */
+  --scale: 1;                    /* globale Skalierung */
+  --font-base: calc(1rem * var(--scale));
+  --font-lg:   calc(1.125rem * var(--scale));
+  --font-xl:   clamp(1.5rem, 3.2vw, calc(2.25rem * var(--scale)));
+
+  /* Spacing */
+  --space-1: calc(0.5rem  * var(--scale));
+  --space-2: calc(0.75rem * var(--scale));
+  --space-3: calc(1rem    * var(--scale));
+  --space-4: calc(1.25rem * var(--scale));
+  --space-5: calc(1.5rem  * var(--scale));
+  --space-6: calc(2rem    * var(--scale));
+  --section-y: clamp(2.5rem, 6vw, calc(5rem * var(--scale)));
+
+  /* Radius */
+  --radius: 0.75rem;
+
+  /* Farben (CTM) */
+  --ctm-black: #000000;
+  --ctm-yellow: #FFD700;
+  --bg: #0a0a0a;
+  --fg: rgba(255,255,255,.92);
+
+  /* Subtile Papier-/Schmirgel-Textur */
+}
+
+/* Optionale globale Skalen (umschaltbar via <html data-scale="...">) */
+:root[data-scale="compact"]  { --scale: .9;  }
+:root[data-scale="spacious"] { --scale: 1.15; }
+
+/* OPTIONAL: Auto-Scaling per Breakpoint — falls gewünscht aktiv lassen */
+@media (min-width: 768px)  { :root { --scale: 1.05; } }   /* md */
+@media (min-width: 1280px) { :root { --scale: 1.12; } }   /* xl */
+
+/* ===============================
+   Base
+   =============================== */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  font-feature-settings: "kern","liga","clig","calt";
+  color-scheme: dark;
+}
+
+body, #root {
+  min-height: 100dvh;            /* viewport-height fix auf Mobile */
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: var(--font-base);
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg);
+  background-image: var(--paper-texture);
+}
+
+/* Standard-Link, nutze Tailwind-Klassen in Komponenten für Variationen */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Fokus klar sichtbar, aber dezent */
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--ctm-yellow);
+  outline-offset: 2px;
+}
+
+/* Reduced motion respektieren */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Heller Modus optional (falls du später Light-Theme willst) */
+/*
+@media (prefers-color-scheme: light) {
+  :root { color-scheme: light; --bg: #ffffff; --fg: #213547; }
+}
+*/
+
+/* ===============================
+   CTM Utilities (Tailwind layer)
+   =============================== */
+@layer utilities {
+  /* Einheitlicher Wrapper für Seitenbreite/Padding */
+@layer utilities {
+  .ctm-wrap {
+    @apply mx-auto w-full max-w-screen-2xl;
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+  }
+}
+
+  /* Vertikaler Abschnittsabstand */
+  .ctm-section {
+    padding-top:    var(--section-y);
+    padding-bottom: var(--section-y);
+  }
+
+  /* Karte/Panel */
+  .ctm-card {
+    @apply border border-white/10 bg-black/40 backdrop-blur-sm;
+    border-radius: var(--radius);
+    padding: var(--space-5);
+  }
+
+  /* Typografie */
+  .ctm-title {
+    font-weight: 800;
+    line-height: 1.1;
+    font-size: var(--font-xl);
+  }
+  .ctm-text    { font-size: var(--font-base); }
+  .ctm-text-lg { font-size: var(--font-lg);   }
+
+  /* Buttons */
+  .ctm-btn {
+    @apply inline-flex items-center justify-center rounded-lg font-semibold transition-transform duration-150;
+    padding: calc(var(--space-2) + 2px) calc(var(--space-4) + 2px);
+  }
+  .ctm-btn--primary {
+    @apply text-black;
+    background: var(--ctm-yellow);
+  }
+  .ctm-btn--primary:active { transform: scale(.99); }
+
+  /* Flexible Abstände */
+  .ctm-gap   { gap: var(--space-4); }
+  .ctm-gap-lg{ gap: var(--space-6); }
+  .ctm-mb    { margin-bottom: var(--space-5); }
+  .ctm-mb-lg { margin-bottom: var(--space-6); }
+}
+
+/* ===============================
+   Form Defaults (dezente Grund-Styles)
+   =============================== */
+@layer base {
+  input, textarea, select {
+    @apply text-white placeholder-white/40 bg-[#111] border border-white/10 rounded-lg;
+  }
+  input:focus, textarea:focus, select:focus {
+    @apply outline-none ring-2;
+    --tw-ring-color: var(--ctm-yellow); /* Tailwind ring Farbe setzen */
+  }
+}
