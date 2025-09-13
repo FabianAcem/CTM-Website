@@ -55,9 +55,9 @@ export default function Hero() {
       <div className={`absolute inset-0 z-10 overflow-hidden ${animate ? "animate-lines" : ""}`}>
         {[
           { top: "33%", height: "4px", opacity: "0.2", color: "#f4bb00", duration: "30s", delay: "0s" },
-          { top: "55%", height: "3px", opacity: "0.15", color: "#f4bb00", duration: "40s", delay: "15s" },
-          { top: "85%", height: "7px", opacity: "0.4", color: "#f4bb00", duration: "28s", delay: "25s" },
-          { top: "28%", height: "4px", opacity: "0.2", color: "#ffe500", duration: "45s", delay: "30s" },
+          { top: "55%", height: "3px", opacity: "0.15", color: "#f4bb00", duration: "40s", delay: "2s" },
+          { top: "85%", height: "7px", opacity: "0.4", color: "#f4bb00", duration: "28s", delay: "5s" },
+          { top: "28%", height: "4px", opacity: "0.2", color: "#ffe500", duration: "45s", delay: "8s" },
         ].map((line, i) => (
           <div
             key={i}
@@ -78,9 +78,9 @@ export default function Hero() {
       {/* 🔹 Vordergrund-Pfeile */}
       <div className={`absolute inset-0 z-30 overflow-hidden ${animate ? "animate-lines" : ""}`}>
         {[
-          { top: "91%", height: "16px", opacity: "0.90", color: "#ffe500", duration: "25s", delay: "5s" },
-          { top: "63%", height: "5px",  opacity: "0.80", color: "#f0e15ad8", duration: "35s", delay: "10s" },
-          { top: "18.5%", height: "8px", opacity: "0.60", color: "#f4bb00", duration: "35s", delay: "10s" },
+          { top: "91%", height: "16px", opacity: "0.90", color: "#ffe500", duration: "25s", delay: "1s" },
+          { top: "63%", height: "5px",  opacity: "0.80", color: "#f0e15ad8", duration: "35s", delay: "3s" },
+          { top: "18.5%", height: "8px", opacity: "0.60", color: "#f4bb00", duration: "35s", delay: "4s" },
         ].map((line, i) => (
           <div
             key={i}
