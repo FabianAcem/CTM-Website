@@ -8,7 +8,7 @@ const THEME_ASSETS = 'C:/Users/acemf/Local Sites/ctm-website/app/public/wp-conte
 export default defineConfig({
   plugins: [react(), tailwindcss()],
     build: {
-    outDir: THEME_ASSETS,
+    outDir: "dist",
     emptyOutDir: false,   // löscht NICHT dein Theme-Ordner
     manifest: true,       // wichtig: WordPress liest dieses Manifest
     rollupOptions: {
