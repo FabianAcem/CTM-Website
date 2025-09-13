@@ -10,9 +10,6 @@ export default defineConfig({
     build: {
     outDir: "dist",
     emptyOutDir: false,   // löscht NICHT dein Theme-Ordner
-    manifest: true,       // wichtig: WordPress liest dieses Manifest
-    rollupOptions: {
-      input: '/src/main.jsx'
-    }
+    manifest: true,       // 
   }
 });
