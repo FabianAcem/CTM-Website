@@ -2,12 +2,13 @@
 @tailwind "utilities";
 @tailwind "base";
 @tailwind "components";
+
 /* ===============================
-   Global Design Tokens
+   Modern Design System - Glasmorphism & 3D
    =============================== */
 :root {
   /* Typo & Baseline */
-  --scale: 1;                    /* globale Skalierung */
+  --scale: 1;
   --font-base: calc(1rem * var(--scale));
   --font-lg:   calc(1.125rem * var(--scale));
   --font-xl:   clamp(1.5rem, 3.2vw, calc(2.25rem * var(--scale)));
@@ -21,32 +22,60 @@
   --space-6: calc(2rem    * var(--scale));
   --section-y: clamp(2.5rem, 6vw, calc(5rem * var(--scale)));
 
-  /* Radius */
-  --radius: 0.75rem;
+  /* Modern Radius System */
+  --radius-sm: 8px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 
-  /* Farben (CTM) */
+  /* CTM Brand Colors */
   --ctm-black: #000000;
   --ctm-yellow: #FFD700;
-  --bg: #0a0a0a;
-  --fg: rgba(255,255,255,.92);
+  --ctm-yellow-light: #FFF066;
+  --ctm-yellow-dark: #E6C200;
+  
+  /* Glasmorphism Colors */
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: rgba(0, 0, 0, 0.25);
+  --glass-highlight: rgba(255, 255, 255, 0.15);
+  
+  /* Gradient System */
+  --gradient-primary: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+  --gradient-secondary: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.1) 100%);
+  --gradient-dark: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(30, 30, 30, 0.9) 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  
+  /* 3D Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.25), 0 8px 32px rgba(0, 0, 0, 0.2);
+  
+  /* Glow Effects */
+  --glow-yellow: 0 0 20px rgba(255, 215, 0, 0.3), 0 0 40px rgba(255, 215, 0, 0.1);
+  --glow-white: 0 0 20px rgba(255, 255, 255, 0.1), 0 0 40px rgba(255, 255, 255, 0.05);
 
-  /* Subtile Papier-/Schmirgel-Textur */
+  /* Background */
+  --bg: #0d1726;
+  --bg-gradient: radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.08) 0%, transparent 50%), 
+                 radial-gradient(circle at 80% 20%, rgba(25, 64, 118, 0.12) 0%, transparent 55%), 
+                 radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+  --fg: rgba(255,255,255,.92);
 }
 
-/* Optionale globale Skalen (umschaltbar via <html data-scale="...">) */
-:root[data-scale="compact"]  { --scale: .9;  }
-:root[data-scale="spacious"] { --scale: 1.15; }
-
-/* OPTIONAL: Auto-Scaling per Breakpoint — falls gewünscht aktiv lassen */
-@media (min-width: 768px)  { :root { --scale: 1.05; } }   /* md */
-@media (min-width: 1280px) { :root { --scale: 1.12; } }   /* xl */
+/* Responsive scaling */
+@media (min-width: 768px)  { :root { --scale: 1.05; } }
+@media (min-width: 1280px) { :root { --scale: 1.12; } }
 
 /* ===============================
-   Base
+   Base with Modern Background
    =============================== */
 *,
 *::before,
-*::after { box-sizing: border-box; }
+*::after { 
+  box-sizing: border-box; 
+}
 
 html {
   -webkit-text-size-adjust: 100%;
@@ -55,105 +84,333 @@ html {
 }
 
 body, #root {
-  min-height: 100dvh;            /* viewport-height fix auf Mobile */
+  min-height: 100dvh;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: var(--font-base);
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--fg);
   background: var(--bg);
-  background-image: var(--paper-texture);
+  background-image: var(--bg-gradient);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Standard-Link, nutze Tailwind-Klassen in Komponenten für Variationen */
 a {
   color: inherit;
   text-decoration: none;
 }
 
-/* Fokus klar sichtbar, aber dezent */
 :where(a, button, input, textarea, select):focus-visible {
   outline: 2px solid var(--ctm-yellow);
   outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
-/* Reduced motion respektieren */
 @media (prefers-reduced-motion: reduce) {
-  * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  * { 
+    animation-duration: .01ms !important; 
+    animation-iteration-count: 1 !important; 
+    transition-duration: .01ms !important; 
+    scroll-behavior: auto !important; 
+  }
 }
-
-/* Heller Modus optional (falls du später Light-Theme willst) */
-/*
-@media (prefers-color-scheme: light) {
-  :root { color-scheme: light; --bg: #ffffff; --fg: #213547; }
-}
-*/
 
 /* ===============================
-   CTM Utilities (Tailwind layer)
+   Modern Glass & 3D Components
    =============================== */
 @layer utilities {
-  /* Einheitlicher Wrapper für Seitenbreite/Padding */
-@layer utilities {
+  /* Glasmorphism Base */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .glass-weak {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* 3D Transform System */
+  .transform-3d {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+  
+  .hover-lift {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-8px) rotateX(5deg);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .hover-tilt {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-tilt:hover {
+    transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) translateZ(20px);
+  }
+
+  /* Button 3D Effects */
+  .btn-3d {
+    position: relative;
+    transform: translateZ(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .btn-3d::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--gradient-glass);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .btn-3d:hover {
+    transform: translateY(-2px) translateZ(10px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .btn-3d:hover::before {
+    opacity: 1;
+  }
+  
+  .btn-3d:active {
+    transform: translateY(0) translateZ(0);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Gradient Text */
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-white {
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Modern Cards - Hero-Blau für alle Kacheln */
+  .card-modern {
+    background: linear-gradient(145deg, rgba(255,215,0,0.18), rgba(22,28,43,0.85));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.22), 0 1.5px 6px rgba(0,0,0,0.10);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-gradient-hero {
+    background: transparent;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.05);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 2rem;
+    overflow: hidden;
+  }
+
+  .text-yellow-ctm {
+    color: #FFD700;
+  }
+
+  .card-padding-x {
+    padding-left: clamp(1.5rem, 2.8vw, 2.75rem);
+    padding-right: clamp(1.5rem, 2.8vw, 2.75rem);
+  }
+  
+  .card-hover {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--glow-white);
+    border-color: rgba(255, 215, 0, 0.3);
+  }
+
+  /* Icon 3D Effects */
+  .icon-3d {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .icon-glow {
+    transition: all 0.3s ease;
+  }
+  
+  .icon-glow:hover {
+    box-shadow: var(--glow-yellow);
+    background: rgba(255, 215, 0, 0.1);
+  }
+
+  /* Background Gradients */
+  .bg-gradient-mesh {
+    background: 
+      radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 75% 75%, rgba(255, 165, 0, 0.04) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+      linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 20, 0.95) 50%, rgba(0, 0, 0, 0.9) 100%);
+  }
+
+  /* Container Animation Enhancements */
+  .container-fly-in {
+    animation: containerFlyIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  @keyframes containerFlyIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-50px) scale(0.8);
+    }
+    60% {
+      opacity: 0.8;
+      transform: translateY(10px) scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  .container-open {
+    animation: containerOpen 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  @keyframes containerOpen {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  /* Animated Gradients */
+  .animated-gradient {
+    background: linear-gradient(-45deg, #FFD700, #FFA500, #FF8C00, #FFD700);
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease infinite;
+  }
+  
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Modern Spacing */
   .ctm-wrap {
     @apply mx-auto w-full max-w-screen-2xl;
     padding-left: var(--space-3);
     padding-right: var(--space-3);
   }
-}
 
-  /* Vertikaler Abschnittsabstand */
   .ctm-section {
-    padding-top:    var(--section-y);
+    padding-top: var(--section-y);
     padding-bottom: var(--section-y);
   }
 
-  /* Karte/Panel */
-  .ctm-card {
-    @apply border border-white/10 bg-black/40 backdrop-blur-sm;
-    border-radius: var(--radius);
-    padding: var(--space-5);
-  }
-
-  /* Typografie */
+  /* Enhanced Typography */
   .ctm-title {
     font-weight: 800;
     line-height: 1.1;
     font-size: var(--font-xl);
+    letter-spacing: -0.02em;
   }
-  .ctm-text    { font-size: var(--font-base); }
-  .ctm-text-lg { font-size: var(--font-lg);   }
+  
+  .ctm-text { font-size: var(--font-base); }
+  .ctm-text-lg { font-size: var(--font-lg); }
 
-  /* Buttons */
+  /* Modern Buttons */
   .ctm-btn {
-    @apply inline-flex items-center justify-center rounded-lg font-semibold transition-transform duration-150;
+    @apply inline-flex items-center justify-center font-semibold;
     padding: calc(var(--space-2) + 2px) calc(var(--space-4) + 2px);
+    border-radius: var(--radius);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
   }
+  
   .ctm-btn--primary {
-    @apply text-black;
-    background: var(--ctm-yellow);
+    background: var(--gradient-primary);
+    color: #000;
+    box-shadow: var(--shadow-md), var(--glow-yellow);
   }
-  .ctm-btn--primary:active { transform: scale(.99); }
+  
+  .ctm-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--glow-yellow);
+  }
+  
+  .ctm-btn--glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    color: white;
+  }
+  
+  .ctm-btn--glass:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 215, 0, 0.3);
+  }
 
-  /* Flexible Abstände */
-  .ctm-gap   { gap: var(--space-4); }
-  .ctm-gap-lg{ gap: var(--space-6); }
-  .ctm-mb    { margin-bottom: var(--space-5); }
+  /* Flexible Spacing */
+  .ctm-gap { gap: var(--space-4); }
+  .ctm-gap-lg { gap: var(--space-6); }
+  .ctm-mb { margin-bottom: var(--space-5); }
   .ctm-mb-lg { margin-bottom: var(--space-6); }
 }
 
 /* ===============================
-   Form Defaults (dezente Grund-Styles)
+   Enhanced Form Styles
    =============================== */
 @layer base {
   input, textarea, select {
-    @apply text-white placeholder-white/40 bg-[#111] border border-white/10 rounded-lg;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: white;
+    transition: all 0.3s ease;
   }
+  
   input:focus, textarea:focus, select:focus {
-    @apply outline-none ring-2;
-    --tw-ring-color: var(--ctm-yellow); /* Tailwind ring Farbe setzen */
+    outline: none;
+    border-color: var(--ctm-yellow);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+    background: rgba(255, 255, 255, 0.12);
+  }
+  
+  input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
   }
 }

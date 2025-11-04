@@ -1,110 +1,133 @@
-import React, { useEffect, useState } from 'react';
-import { Calendar, Award, Users } from 'lucide-react';
+import React from 'react';
+import { Calendar, Award, Users, ArrowRight } from 'lucide-react';
+import { useScrollAnimation, useStaggeredAnimation, slideInClasses, scrollToElement } from "../utils/animations.js";
+import { useSection } from "../hooks/useWordPressData.js";
+import { getIcon } from "../utils/icon-manager.js";
 
 
-const HistorySection = ({ scrollY }) => {
-  const [isVisible, setIsVisible] = useState(false);
+const HistorySection = () => {
+  const historyData = useSection('history');
+  const [sectionRef, isVisible] = useScrollAnimation({ threshold: 0.2 });
+  const [timelineRef, visibleTimelineItems] = useStaggeredAnimation(3, 300);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const section = document.getElementById('about');
-      if (section) {
-        const rect = section.getBoundingClientRect();
-        setIsVisible(rect.top < window.innerHeight && rect.bottom > 0);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check on mount
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // WordPress-editierbare Timeline und Values
+  const timelineData = historyData.timeline || [];
+  const values = historyData.values || [];
 
   return (
-    <section id="about" className="min-h-screen py-20 relative overflow-hidden bg-gray-900/30">
-      <div className="container mx-auto px-6">
+    <section 
+      id="about" 
+      ref={sectionRef}
+      className="min-h-screen flex items-center relative overflow-hidden text-white py-20 lg:py-32"
+    >
+      <div className="container mx-auto px-6 max-w-7xl w-full">
+        {/* Header mit glasmorphism */}
+        <div className={`text-center mb-10 lg:mb-12 ${slideInClasses.fromLeft.transition} ${
+          isVisible ? slideInClasses.fromLeft.visible : slideInClasses.fromLeft.hidden
+        }`}>
+          <div className="mb-8 hover-tilt transform-3d border border-white/12 rounded-2xl backdrop-blur-md bg-white/5 shadow-lg shadow-black/10 py-6 card-padding-x">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-yellow-ctm mb-3">
+              {historyData.title || "Unsere Geschichte"}
+            </h2>
+            <div className="w-24 h-1 animated-gradient mx-auto mb-4 rounded-full"></div>
+            <p className="text-base lg:text-lg text-white/80 max-w-2xl mx-auto">
+              {historyData.subtitle || "Über 25 Jahre Erfahrung – vom Familienunternehmen zum Marktführer"}
+            </p>
+          </div>
+        </div>
 
-        <div className="grid md:grid-cols-2 gap-16 items-center">
-          {/* Content */}
-          <div className={`space-y-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
-            <div>
-              <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                Unsere <span className="text-yellow-400">Geschichte</span>
-              </h2>
-              <div className="w-24 h-1 bg-yellow-400 mb-8"></div>
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {/* Content mit glasmorphism */}
+          <div className={`space-y-6 ${slideInClasses.fromLeft.transition} ${
+            isVisible ? slideInClasses.fromLeft.visible : slideInClasses.fromLeft.hidden
+          }`}>
+            <div className="card-modern py-6 card-padding-x space-y-4 text-base lg:text-lg text-white/90 leading-relaxed hover-tilt transform-3d">
+              <div dangerouslySetInnerHTML={{ __html: historyData.content || `
+                <p>Seit über <strong className="text-gradient">25 Jahren</strong> führend im Containertransport. 
+                Was als kleines Familienunternehmen begann, ist heute einer der führenden Spediteure in der Region.</p>
+                <p>Heute transportieren wir <strong className="text-gradient">über 15.000 Tonnen</strong> jährlich 
+                mit einem Team von <strong className="text-white">50+ Experten</strong>, die täglich für 
+                sichere Transporte sorgen.</p>
+              ` }} />
             </div>
 
-            <div className="space-y-6 text-lg text-gray-300 leading-relaxed">
-              <p>
-                Seit über <strong className="text-yellow-400">25 Jahren</strong> steht Container Transport Mainz für 
-                zuverlässige und sichere Logistiklösungen. Was als kleines Familienunternehmen begann, 
-                hat sich zu einem der führenden Spediteure in der Region entwickelt.
-              </p>
-              <p>
-                Mit unserem Sitz in <strong className="text-white">Mainz</strong> bedienen wir ganz Deutschland 
-                und Europa. Unser Erfolg basiert auf Vertrauen, Qualität und der persönlichen 
-                Betreuung unserer Kunden.
-              </p>
-              <p>
-                Heute transportieren wir <strong className="text-yellow-400">über 10.000 Tonnen</strong> jährlich 
-                und beschäftigen ein Team von erfahrenen Logistikexperten, die täglich dafür sorgen, 
-                dass Ihre Güter sicher ans Ziel gelangen.
-              </p>
+            {/* Timeline mit floating glass panels - durchsichtige Hintergrund-Kachel */}
+            <div ref={timelineRef} className="py-5 card-padding-x lg:py-6 hover-tilt transform-3d border border-white/12 rounded-2xl backdrop-blur-md bg-white/5 shadow-lg shadow-black/10">
+              <h3 className="text-lg lg:text-xl font-semibold text-white mb-5">Meilensteine</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+                {timelineData.filter(item => item.visible !== false).map((item, index) => (
+                  <div
+                    key={item.year}
+                    className={`text-center card-modern card-hover hover-lift transform-3d py-4 card-padding-x transition-all duration-700 ${
+                      visibleTimelineItems.includes(index)
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-8"
+                    }`}
+                    style={{ transitionDelay: `${index * 200}ms` }}
+                  >
+                    <div className="w-12 h-12 lg:w-14 lg:h-14 icon-3d icon-glow rounded-full flex items-center justify-center mx-auto mb-3">
+                      {React.createElement(getIcon(item.icon), { className: "w-6 h-6 lg:w-7 lg:h-7 text-gradient" })}
+                    </div>
+                    <div className="text-xl lg:text-2xl font-bold text-gradient mb-1">{item.year}</div>
+                    <div className="text-sm lg:text-base font-semibold text-white mb-1">{item.title}</div>
+                    <div className="text-xs lg:text-sm text-white/70">{item.description}</div>
+                    
+                    {/* Gradient accent */}
+                    <div className="absolute top-2 right-2 w-4 h-4 bg-gradient-to-br from-yellow-400/30 to-transparent rounded-full"></div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Timeline Points */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-yellow-400" />
-                </div>
-                <div className="text-2xl font-bold text-yellow-400">1998</div>
-                <div className="text-sm text-gray-400">Gründung</div>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Award className="w-8 h-8 text-yellow-400" />
-                </div>
-                <div className="text-2xl font-bold text-yellow-400">2010</div>
-                <div className="text-sm text-gray-400">ISO Zertifizierung</div>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-yellow-400" />
-                </div>
-                <div className="text-2xl font-bold text-yellow-400">50+</div>
-                <div className="text-sm text-gray-400">Mitarbeiter</div>
-              </div>
+            {/* CTA mit 3D button */}
+            <div className="pt-2">
+              <button
+                onClick={() => scrollToElement("fleet")}
+                className="ctm-btn--primary btn-3d inline-flex items-center gap-2 px-5 py-2.5 lg:px-6 lg:py-3 font-semibold rounded-xl glow-yellow"
+              >
+                <span className="relative z-10">Unsere Flotte ansehen</span>
+                <ArrowRight className="w-4 h-4 relative z-10" />
+              </button>
             </div>
           </div>
 
-          {/* Visual Element */}
-          <div className={`relative transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-lg border border-gray-700">
-              <div className="space-y-6">
-                <h3 className="text-2xl font-semibold text-white mb-6">Unsere Werte</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <span className="text-gray-300">Zuverlässigkeit und Pünktlichkeit</span>
+          {/* Values mit glasmorphism & 3D stats - durchsichtige Hintergrund-Kachel */}
+            <div className={`py-6 card-padding-x lg:py-8 hover-tilt transform-3d border border-white/12 rounded-2xl backdrop-blur-md bg-white/5 shadow-lg shadow-black/10 transition-all duration-700 delay-500 ${
+            isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+          }`}>
+            <h3 className="text-xl lg:text-2xl font-semibold text-white mb-6">Unsere Werte</h3>
+            
+            {/* 3D Stats Grid - WordPress-editierbar */}
+            {historyData.stats && historyData.stats.length > 0 && (
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                {historyData.stats.filter(stat => stat.visible !== false).map((stat, index) => (
+                  <div key={index} className="card-modern card-hover hover-lift transform-3d text-center py-4 card-padding-x">
+                    <div className="text-xl lg:text-2xl font-bold text-gradient">{stat.number}</div>
+                    <div className="text-xs lg:text-sm text-white/80">{stat.label}</div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <span className="text-gray-300">Höchste Sicherheitsstandards</span>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <span className="text-gray-300">Persönlicher Kundenservice</span>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <span className="text-gray-300">Nachhaltige Transportlösungen</span>
-                  </div>
-                </div>
+                ))}
               </div>
+            )}
+
+            {/* Values List mit glasmorphism bullets - WordPress-editierbar */}
+            <div className="space-y-3">
+              {values.filter(value => value.visible !== false).map((value, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center space-x-3 glass-weak rounded-lg p-2 hover-lift transition-all duration-500 ${
+                    isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
+                  }`}
+                  style={{ transitionDelay: `${800 + index * 100}ms` }}
+                >
+                  <div className="w-2 h-2 animated-gradient rounded-full flex-shrink-0"></div>
+                  <span className="text-sm lg:text-base text-white/90">{value.text}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
+
     </section>
   );
 };

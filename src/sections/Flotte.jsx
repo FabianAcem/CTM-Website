@@ -1,179 +1,239 @@
-import React, { useEffect, useState } from 'react';
-import { Truck, Users, Package, MapPin } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Truck, Users, Package, MapPin, ArrowRight } from 'lucide-react';
+import { useScrollAnimation, useStaggeredAnimation, slideInClasses, scrollToElement } from "../utils/animations.js";
+import { useSection } from "../hooks/useWordPressData.js";
+import { getIcon } from "../utils/icon-manager.js";
 
 const FleetSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [counters, setCounters] = useState({
-    tonnage: 0,
-    customers: 0,
-    vehicles: 0,
-    routes: 0
-  });
+  const fleetData = useSection('fleet');
+  const [sectionRef, isVisible] = useScrollAnimation({ threshold: 0.2 });
+  const [statsRef, visibleStats] = useStaggeredAnimation(4, 200);
+  const [detailsRef, visibleDetails] = useStaggeredAnimation(3, 300);
+  
+  const [counters, setCounters] = useState({});
 
+  // WordPress-editierbare Stats
+  const stats = fleetData.stats || [];
+  
   useEffect(() => {
-    const handleScroll = () => {
-      const section = document.getElementById('fleet');
-      if (section) {
-        const rect = section.getBoundingClientRect();
-        const visible = rect.top < window.innerHeight && rect.bottom > 0;
-        setIsVisible(visible);
-        
-        if (visible && counters.tonnage === 0) {
-          // Animate counters
-          const duration = 2000;
-          const targets = { tonnage: 15000, customers: 500, vehicles: 45, routes: 200 };
+    if (isVisible && stats.length > 0) {
+      // Animate counters for stats with numeric targets
+      const duration = 2000;
+      
+      stats.forEach((stat, index) => {
+        if (stat.target && !isNaN(stat.target)) {
+          const target = parseInt(stat.target);
+          const increment = target / (duration / 50);
+          let current = 0;
           
-          Object.keys(targets).forEach(key => {
-            const target = targets[key];
-            const increment = target / (duration / 50);
-            let current = 0;
-            
-            const timer = setInterval(() => {
-              current += increment;
-              if (current >= target) {
-                current = target;
-                clearInterval(timer);
-              }
-              setCounters(prev => ({ ...prev, [key]: Math.floor(current) }));
-            }, 50);
-          });
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              current = target;
+              clearInterval(timer);
+            }
+            setCounters(prev => ({ ...prev, [index]: Math.floor(current) }));
+          }, 50);
         }
-      }
-    };
+      });
+    }
+  }, [isVisible, stats]);
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check on mount
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const truckPositions = [
-    { x: '10%', y: '20%', delay: '0ms' },
-    { x: '70%', y: '15%', delay: '300ms' },
-    { x: '30%', y: '60%', delay: '600ms' },
-    { x: '80%', y: '70%', delay: '900ms' },
-    { x: '50%', y: '40%', delay: '1200ms' }
-  ];
+  // WordPress-editierbare Fleet Details  
+  const fleetDetails = fleetData.vehicle_types || [];
 
   return (
-    <section id="fleet" className="min-h-screen py-20 relative overflow-hidden bg-gray-900/30">
-      <div className="container mx-auto px-6">
-        {/* Section Title */}
-        <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Unsere <span className="text-yellow-400">Flotte</span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Eine moderne Fahrzeugflotte für alle Ihre Transportbedürfnisse
-          </p>
+    <section 
+      id="fleet" 
+      ref={sectionRef}
+      className="min-h-screen flex items-center relative overflow-hidden text-white"
+    >
+      <div className="container mx-auto px-6 max-w-7xl w-full">
+        {/* Section Title mit glasmorphism */}
+        <div className={`text-center mb-10 lg:mb-12 ${slideInClasses.fromLeft.transition} ${
+          isVisible ? slideInClasses.fromLeft.visible : slideInClasses.fromLeft.hidden
+        }`}>
+          <div className="mb-8 hover-tilt transform-3d border border-white/12 rounded-2xl backdrop-blur-md bg-white/5 shadow-lg shadow-black/10 py-6 card-padding-x">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-yellow-ctm mb-3">
+              {fleetData.title || "Unsere Flotte"}
+            </h2>
+            <p className="text-base lg:text-lg text-white/80 max-w-2xl mx-auto">
+              {fleetData.subtitle || "Moderne, umweltfreundliche Fahrzeugflotte für alle Transportbedürfnisse"}
+            </p>
+          </div>
         </div>
 
-        {/* Animated Truck Fleet */}
-        <div className="relative h-96 mb-16 bg-gray-900/30 rounded-lg overflow-hidden">
-          {truckPositions.map((position, index) => (
-            <div
-              key={index}
-              className={`absolute w-16 h-12 transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}
-              style={{
-                left: position.x,
-                top: position.y,
-                transitionDelay: position.delay
-              }}
+        {/* Kompakte Statistics Grid - alle 4 Kacheln durchsichtig */}
+        <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-8">
+          {stats.filter(stat => stat.visible !== false).map((stat, index) => (
+            <div 
+              key={stat.label}
+              className={`card-hover hover-lift transform-3d text-center py-4 card-padding-x border border-white/12 backdrop-blur-md bg-white/5 shadow-lg shadow-black/10 rounded-2xl transition-all duration-700 ${
+                visibleStats.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+              style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <svg viewBox="0 0 80 60" className="w-full h-full">
-                <rect x="15" y="15" width="50" height="25" fill="#333" rx="2"/>
-                <rect x="0" y="20" width="20" height="20" fill="#444" rx="2"/>
-                <circle cx="12" cy="45" r="5" fill="#222"/>
-                <circle cx="12" cy="45" r="3" fill="#666"/>
-                <circle cx="50" cy="45" r="5" fill="#222"/>
-                <circle cx="50" cy="45" r="3" fill="#666"/>
-                <circle cx="65" cy="45" r="5" fill="#222"/>
-                <circle cx="65" cy="45" r="3" fill="#666"/>
-                <text x="40" y="30" textAnchor="middle" fill="#FFD700" fontSize="6" fontWeight="bold">CTM</text>
-              </svg>
+              <div className="flex justify-center items-center mb-2">
+                <div className="icon-3d icon-glow p-2 rounded-lg bg-gradient-to-br from-yellow-400/20 to-yellow-500/10 border border-yellow-400/30">
+                  <div className="text-gradient">
+                    {React.createElement(getIcon(stat.icon), { className: "w-6 h-6" })}
+                  </div>
+                </div>
+              </div>
+              <div className="text-lg lg:text-xl font-bold text-gradient mb-1">
+                {stat.target && !isNaN(stat.target) ? (counters[index] || 0).toLocaleString() : stat.value}{stat.suffix || ""}
+              </div>
+              <div className="text-xs lg:text-sm text-white font-medium mb-1">{stat.label}</div>
+              <div className="text-xs text-white/60">{stat.sublabel}</div>
+              
+              {/* Gradient accent corner */}
+              <div className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-br from-yellow-400/30 to-transparent rounded-full"></div>
             </div>
           ))}
+        </div>
 
-          {/* Fleet Stats Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className={`bg-black/80 backdrop-blur-sm p-8 rounded-lg border border-yellow-400/30 transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-              <div className="text-center">
-                <Truck className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-                <div className="text-3xl font-bold text-yellow-400 mb-2">{counters.vehicles}+</div>
-                <div className="text-white font-semibold">Fahrzeuge im Einsatz</div>
+        {/* Rest des Content in kompakterer Anordnung */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Kompakte Fleet Visualization - durchsichtige Hintergrund-Kachel */}
+          <div className={`rounded-xl py-5 card-padding-x hover-tilt transform-3d border border-white/12 backdrop-blur-md bg-white/5 shadow-lg shadow-black/10 transition-all duration-1000 ${
+            isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+          }`}>
+            <div className="text-center mb-3">
+              <div className="inline-flex items-center gap-2 glass-weak px-3 py-1.5 rounded-full hover-lift">
+                <Truck className="w-4 h-4 text-gradient" />
+                <span className="text-xs lg:text-sm text-gradient font-semibold">
+                  {counters.vehicles}+ Fahrzeuge
+                </span>
+              </div>
+            </div>
+            
+            {/* Kompakte Fleet Kategorien */}
+            <div className="space-y-2">
+              {/* Standard-Fahrzeuge */}
+              <div className="card-modern rounded-lg py-3 card-padding-x">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="text-xs font-semibold text-white">Standard</h4>
+                  <span className="text-gradient font-bold text-xs">24</span>
+                </div>
+                <div className="flex gap-0.5">
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <div
+                      key={i}
+                      className={`w-2.5 h-4 bg-gradient-to-t from-yellow-400/60 to-yellow-400/20 rounded-sm transition-all duration-300 hover:scale-110 ${
+                        isVisible ? "opacity-100 scale-100" : "opacity-0 scale-50"
+                      }`}
+                      style={{ transitionDelay: `${i * 30}ms` }}
+                    />
+                  ))}
+                </div>
+                <div className="flex gap-0.5 mt-0.5">
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <div
+                      key={i + 12}
+                      className={`w-2.5 h-4 bg-gradient-to-t from-yellow-400/60 to-yellow-400/20 rounded-sm transition-all duration-300 hover:scale-110 ${
+                        isVisible ? "opacity-100 scale-100" : "opacity-0 scale-50"
+                      }`}
+                      style={{ transitionDelay: `${(i + 12) * 30}ms` }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Spezial-Fahrzeuge */}
+              <div className="card-modern rounded-lg py-3 card-padding-x">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="text-xs font-semibold text-white">Spezial</h4>
+                  <span className="text-gradient font-bold text-xs">12</span>
+                </div>
+                <div className="flex gap-0.5">
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <div
+                      key={i}
+                      className={`w-2.5 h-3.5 bg-gradient-to-t from-yellow-500/60 to-yellow-500/20 rounded-sm transition-all duration-300 hover:scale-110 ${
+                        isVisible ? "opacity-100 scale-100" : "opacity-0 scale-50"
+                      }`}
+                      style={{ transitionDelay: `${(i + 24) * 30}ms` }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Schwerlast-Fahrzeuge */}
+              <div className="card-modern rounded-lg py-3 card-padding-x">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="text-xs font-semibold text-white">Schwerlast</h4>
+                  <span className="text-gradient font-bold text-xs">9</span>
+                </div>
+                <div className="flex gap-0.5">
+                  {Array.from({ length: 9 }, (_, i) => (
+                    <div
+                      key={i}
+                      className={`w-2.5 h-5 bg-gradient-to-t from-amber-600/60 to-amber-600/20 rounded-sm transition-all duration-300 hover:scale-110 ${
+                        isVisible ? "opacity-100 scale-100" : "opacity-0 scale-50"
+                      }`}
+                      style={{ transitionDelay: `${(i + 36) * 30}ms` }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Fleet Status Indicators */}
+              <div className="mt-2 flex justify-center gap-3 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-white/70">42</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                  <span className="text-white/70">3</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Statistics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className={`text-center p-8 bg-gray-900/50 rounded-lg border border-gray-700 transition-all duration-1000 counter-animation ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-               style={{ transitionDelay: '200ms' }}>
-            <Package className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            <div className="text-4xl font-bold text-yellow-400 mb-2">{counters.tonnage.toLocaleString()}+</div>
-            <div className="text-white font-semibold">Tonnen transportiert</div>
-            <div className="text-gray-400 text-sm mt-2">pro Jahr</div>
-          </div>
-
-          <div className={`text-center p-8 bg-gray-900/50 rounded-lg border border-gray-700 transition-all duration-1000 counter-animation ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-               style={{ transitionDelay: '400ms' }}>
-            <Users className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            <div className="text-4xl font-bold text-yellow-400 mb-2">{counters.customers}+</div>
-            <div className="text-white font-semibold">Zufriedene Kunden</div>
-            <div className="text-gray-400 text-sm mt-2">seit 1998</div>
-          </div>
-
-          <div className={`text-center p-8 bg-gray-900/50 rounded-lg border border-gray-700 transition-all duration-1000 counter-animation ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-               style={{ transitionDelay: '600ms' }}>
-            <Truck className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            <div className="text-4xl font-bold text-yellow-400 mb-2">{counters.vehicles}</div>
-            <div className="text-white font-semibold">Moderne Fahrzeuge</div>
-            <div className="text-gray-400 text-sm mt-2">Euro 6 Standard</div>
-          </div>
-
-          <div className={`text-center p-8 bg-gray-900/50 rounded-lg border border-gray-700 transition-all duration-1000 counter-animation ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-               style={{ transitionDelay: '800ms' }}>
-            <MapPin className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            <div className="text-4xl font-bold text-yellow-400 mb-2">{counters.routes}+</div>
-            <div className="text-white font-semibold">Europäische Routen</div>
-            <div className="text-gray-400 text-sm mt-2">täglich bedient</div>
+          {/* Fleet Details mit glasmorphism */}
+          <div ref={detailsRef} className="space-y-3">
+            {fleetDetails.filter(detail => detail.visible !== false).map((detail, index) => (
+              <div
+                key={detail.title}
+                className={`card-modern card-hover hover-lift transform-3d py-4 card-padding-x transition-all duration-700 ${
+                  visibleDetails.includes(index) ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+                }`}
+                style={{ transitionDelay: `${index * 200}ms` }}
+              >
+                <h3 className="text-sm font-semibold text-white mb-2">{detail.title}</h3>
+                <ul className="space-y-1">
+                  {detail.features?.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-start gap-2 text-xs text-white/80">
+                      <div className="w-1.5 h-1.5 animated-gradient rounded-full mt-1.5 flex-shrink-0"></div>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                {/* Gradient accent corner */}
+                <div className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-br from-yellow-400/20 to-transparent rounded-full"></div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Fleet Details */}
-        <div className={`mt-16 grid md:grid-cols-3 gap-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-             style={{ transitionDelay: '1000ms' }}>
-          <div className="bg-gray-900/50 p-8 rounded-lg border border-gray-700">
-            <h3 className="text-2xl font-semibold text-white mb-4">Standard Container</h3>
-            <ul className="space-y-2 text-gray-300">
-              <li>• 20ft & 40ft Container</li>
-              <li>• Maximale Nutzlast: 28 Tonnen</li>
-              <li>• GPS-Tracking</li>
-              <li>• Temperaturüberwachung</li>
-            </ul>
+        {/* CTA mit 3D button - WordPress-editierbar */}
+        {fleetData.cta && (
+          <div className={`text-center mt-6 transition-all duration-700 delay-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}>
+            <button
+              onClick={() => scrollToElement(fleetData.cta.href?.replace('#', '') || "contact")}
+              className="ctm-btn--primary btn-3d inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-xl glow-yellow"
+            >
+              <span className="relative z-10">{fleetData.cta.text || "Jetzt Transport anfragen"}</span>
+              <ArrowRight className="w-4 h-4 relative z-10" />
+            </button>
           </div>
-
-          <div className="bg-gray-900/50 p-8 rounded-lg border border-gray-700">
-            <h3 className="text-2xl font-semibold text-white mb-4">Spezialfahrzeuge</h3>
-            <ul className="space-y-2 text-gray-300">
-              <li>• Kühlcontainer</li>
-              <li>• Gefahrguttransport</li>
-              <li>• Schwerlasttransporte</li>
-              <li>• Überbreite Ladungen</li>
-            </ul>
-          </div>
-
-          <div className="bg-gray-900/50 p-8 rounded-lg border border-gray-700">
-            <h3 className="text-2xl font-semibold text-white mb-4">Service</h3>
-            <ul className="space-y-2 text-gray-300">
-              <li>• 24/7 Verfügbarkeit</li>
-              <li>• Live-Tracking</li>
-              <li>• Expressdienst</li>
-              <li>• Vollversicherung</li>
-            </ul>
-          </div>
-        </div>
+        )}
       </div>
+
     </section>
   );
 };

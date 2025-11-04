@@ -1,188 +1,156 @@
 import React from "react";
-import { Truck, ShieldCheck, Globe } from "lucide-react";
+import { ArrowRight, CalendarClock, ShieldCheck, Truck } from "lucide-react";
+import { scrollToElement } from "../utils/animations.js";
+
+const highlightCards = [
+  {
+    icon: Truck,
+    title: "Eigener Fuhrpark",
+    description: "Moderne Sattelzüge für Container bis 45 ft und europaweite Relationen.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Versichert & geprüft",
+    description: "ISO-zertifizierte Prozesse, feste Ansprechpartner und 5 Mio. EUR Absicherung.",
+  },
+  {
+    icon: CalendarClock,
+    title: "Live Timing",
+    description: "Track & Trace Meldungen in Echtzeit für Disposition und Kundenportal.",
+  },
+];
 
 export default function Hero() {
-  const scrollTo = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const animate = true; // Animationen werden sofort aktiviert
-
   return (
-    <section id="hero" className="relative overflow-hidden bg-gray-950 text-white">
-      {/* 🔹 Linien & Pfeilspitzen */}
+    <section id="hero" className="relative overflow-hidden top-8 text-white pt-28 pb-16">
       <style>{`
-        .animate-lines .line { animation: shoot-arrow linear infinite; }
-
-        @keyframes shoot-arrow {
+        .hero-lines .hero-line {
+          animation: hero-shoot 9s linear infinite;
+        }
+        @keyframes hero-shoot {
           0% { transform: translateX(-120%) scaleX(0.4); opacity: 0; }
           12% { transform: translateX(-10%) scaleX(0.85); opacity: var(--line-opacity); }
-          50% { transform: translateX(50%) scaleX(1); opacity: var(--line-opacity); }
-          88% { transform: translateX(120%) scaleX(0.85); opacity: var(--line-opacity); }
+          55% { transform: translateX(55%) scaleX(1); opacity: var(--line-opacity); }
+          90% { transform: translateX(120%) scaleX(0.85); opacity: var(--line-opacity); }
           100% { transform: translateX(200%) scaleX(0.4); opacity: 0; }
         }
-
-        .line {
+        .hero-line {
           position: absolute;
+          top: var(--line-top);
           height: var(--line-height);
-          width: 60vw;                 /* kürzer auf Mobile */
-          background-color: var(--line-color);
+          width: var(--line-width);
+          background: var(--line-color);
           opacity: var(--line-opacity);
           border-radius: 9999px;
           transform-origin: left center;
           will-change: transform, opacity;
-          transform: translateX(-120%) scaleX(0.4);
         }
-        /* ab SM etwas länger, ab LG wie gehabt */
-        @media (min-width: 640px) { .line { width: 70vw; } }
-        @media (min-width: 1024px) { .line { width: 50vw; } }
-
-        .line::after {
-          content: '';
+        .hero-line::after {
+          content: "";
           position: absolute;
+          right: -8px;
           top: 50%;
-          right: var(--tip-overlap, 0px);
-          width: 0; height: 0;
-          border-top: calc(var(--line-height) * 1.5) solid transparent;
-          border-bottom: calc(var(--line-height) * 1.5) solid transparent;
-          border-left: calc(var(--line-height) * 2.5) solid var(--line-color);
           transform: translateY(-50%);
+          width: 0;
+          height: 0;
+          border-left: 12px solid var(--line-color);
+          border-top: 6px solid transparent;
+          border-bottom: 6px solid transparent;
+        }
+        @media (min-width: 768px) {
+          .hero-line { width: calc(var(--line-width) * 1.2); }
+        }
+        @media (min-width: 1280px) {
+          .hero-line { width: calc(var(--line-width) * 1.6); }
+        }
+        .tilt-card {
+          transition: transform 0.35s ease, box-shadow 0.35s ease;
+          transform: translateZ(0);
+        }
+        .tilt-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 22px 45px rgba(0, 0, 0, 0.35);
         }
       `}</style>
 
-      {/* 🔹 Hintergrund-Pfeile */}
-      <div className={`absolute inset-0 z-10 overflow-hidden ${animate ? "animate-lines" : ""}`}>
-        {[
-          { top: "33%", height: "4px", opacity: "0.2", color: "#f4bb00", duration: "30s", delay: "0s" },
-          { top: "55%", height: "3px", opacity: "0.15", color: "#f4bb00", duration: "40s", delay: "2s" },
-          { top: "85%", height: "7px", opacity: "0.4", color: "#f4bb00", duration: "28s", delay: "5s" },
-          { top: "28%", height: "4px", opacity: "0.2", color: "#ffe500", duration: "45s", delay: "8s" },
-        ].map((line, i) => (
-          <div
-            key={i}
-            className="line"
+      <div className="absolute inset-0 hero-lines pointer-events-none">
+        {[...Array(6)].map((_, index) => (
+          <span
+            key={index}
+            className="hero-line"
             style={{
-              top: line.top,
-              animationDuration: line.duration,
-              animationDelay: line.delay,
-              "--line-color": line.color,
-              "--line-height": line.height,
-              "--line-opacity": line.opacity,
-              "--tip-overlap": `calc(${line.height} * -1)`,
+              "--line-top": `${16 + index * 12}%`,
+              "--line-height": `${Math.max(1.5, Math.random() * 2.2)}px`,
+              "--line-color": index % 2 === 0 ? "#FFD700" : "#374151",
+              "--line-opacity": 0.25 + Math.random() * 0.4,
+              "--line-width": "48vw",
+              animationDelay: `${index * 1.3}s`,
             }}
           />
         ))}
       </div>
 
-      {/* 🔹 Vordergrund-Pfeile */}
-      <div className={`absolute inset-0 z-30 overflow-hidden ${animate ? "animate-lines" : ""}`}>
-        {[
-          { top: "91%", height: "16px", opacity: "0.90", color: "#ffe500", duration: "25s", delay: "1s" },
-          { top: "63%", height: "5px",  opacity: "0.80", color: "#f0e15ad8", duration: "35s", delay: "3s" },
-          { top: "18.5%", height: "8px", opacity: "0.60", color: "#f4bb00", duration: "35s", delay: "4s" },
-        ].map((line, i) => (
-          <div
-            key={i}
-            className="line"
-            style={{
-              top: line.top,
-              animationDuration: line.duration,
-              animationDelay: line.delay,
-              "--line-color": line.color,
-              "--line-height": line.height,
-              "--line-opacity": line.opacity,
-              "--tip-overlap": `calc(${line.height} * -1)`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Hauptinhalt */}
-      <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-12 lg:py-16">
-        <div className="rounded-3xl border border-yellow-400/40 bg-gray-900/60 p-5 sm:p-8 lg:p-12 backdrop-blur-sm shadow-[0_0_40px_rgba(250,204,21,0.25)]">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
-            {/* Linke Seite */}
-            <div>
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-4 py-1.5 sm:px-6 sm:py-2 mb-3 sm:mb-4">
-                <span className="inline-block h-2 w-2 rounded-full bg-yellow-400 animate-pulse" />
-                <span className="text-xs sm:text-sm font-medium text-yellow-200/90">
-                  Spedition · Containerlogistik
-                </span>
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-8">
+        <div className="hero-shell relative w-full overflow-hidden rounded-[28px] border border-white/10 bg-white/2 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-10 lg:p-12">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 opacity-60" />
+          <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-14">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/40 bg-yellow-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-200 sm:text-sm">
+                <span className="h-2 w-2 rounded-full bg-yellow-400 shadow-[0_0_12px_rgba(250,204,21,0.8)]" />
+                Container Transport Mainz
               </div>
 
-              {/* Headline (clamp für XS → LG) */}
-              <h1 className="font-extrabold leading-tight text-[clamp(2rem,8vw,3.75rem)] sm:text-6xl lg:text-7xl">
-                Container{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500">
-                  Transport
-                </span>{" "}
-                Mainz
+              <h1 className="text-[1.9rem] font-extrabold leading-tight text-white sm:text-[2.3rem] lg:text-[2.6rem]">
+                Containerlogistik mit Fokus auf Tempo, Transparenz und feste Ansprechpartner
               </h1>
 
-              {/* Subline */}
-              <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-200 leading-relaxed max-w-prose">
-                Wir bringen Ihre Container zuverlässig ans Ziel – sicher, effizient und
-                transparent. Vertrauen Sie auf über 25 Jahre Erfahrung und ein globales Netzwerk.
+              <p className="max-w-xl text-sm text-white/70 sm:text-base">
+                Wir sichern Ihren Containerlauf – von der Disposition bis zur Ankunft. Europaweit, digital begleitet und mit direkter Dispo-Hotline.
               </p>
 
-              {/* CTAs */}
-              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <button
-                  onClick={() => scrollTo("contact")}
-                  className="rounded-xl bg-gradient-to-r from-yellow-300 to-yellow-500 px-6 py-3 sm:px-8 sm:py-4 font-semibold text-gray-900 shadow-lg shadow-yellow-500/30 transition-transform hover:scale-105"
+                  type="button"
+                  onClick={() => scrollToElement("kontakt")}
+                  className="tilt-card inline-flex items-center justify-center gap-3 rounded-2xl border border-yellow-400/40 bg-yellow-400 px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-yellow-900/40 transition hover:bg-yellow-300 sm:text-base"
                 >
-                  Kontakt aufnehmen
+                  Angebot anfordern
+                  <ArrowRight className="h-5 w-5" />
                 </button>
                 <button
-                  onClick={() => scrollTo("services")}
-                  className="rounded-xl border border-yellow-400/40 bg-yellow-400/10 px-6 py-3 sm:px-8 sm:py-4 font-semibold text-yellow-100 transition hover:bg-yellow-400/20"
+                  type="button"
+                  onClick={() => scrollToElement("services")}
+                  className="tilt-card inline-flex items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-black/30 transition hover:border-yellow-400/40 hover:text-yellow-100 sm:text-base"
                 >
-                  Unsere Leistungen
+                  Leistungen entdecken
                 </button>
               </div>
+
+              <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+                <span className="h-1.5 w-12 rounded-full bg-yellow-400/60" />
+                24/7 Dispo erreichbar · Live Tracking inklusive
+              </span>
             </div>
 
-            {/* Rechte Seite */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="rounded-xl bg-gray-800/60 border border-yellow-400/30 p-4 sm:p-5">
-                <Truck className="w-9 h-9 sm:w-10 sm:h-10 text-yellow-400 mb-2" />
-                <h3 className="text-sm sm:text-md font-semibold">Effiziente Transporte</h3>
-                <p className="mt-1 text-gray-300 text-sm">
-                  Pünktlich, transparent und zuverlässig.
-                </p>
-              </div>
-              <div className="rounded-xl bg-gray-800/60 border border-yellow-400/30 p-4 sm:p-5">
-                <ShieldCheck className="w-9 h-9 sm:w-10 sm:h-10 text-yellow-400 mb-2" />
-                <h3 className="text-sm sm:text-md font-semibold">Maximale Sicherheit</h3>
-                <p className="mt-1 text-gray-300 text-sm">
-                  Vollversichert und bestens geschützt.
-                </p>
-              </div>
-              <div className="rounded-xl bg-gray-800/60 border border-yellow-400/30 p-4 sm:p-5">
-                <Globe className="w-9 h-9 sm:w-10 sm:h-10 text-yellow-400 mb-2" />
-                <h3 className="text-sm sm:text-md font-semibold">Weltweit vernetzt</h3>
-                <p className="mt-1 text-gray-300 text-sm">
-                  International und regional flexibel.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Stats unten quer */}
-          <div className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
-            <div className="rounded-xl border border-yellow-400/30 bg-yellow-400/10 p-3 sm:p-4">
-              <div className="text-2xl sm:text-3xl font-bold">25+</div>
-              <div className="text-xs sm:text-sm text-yellow-100/80 mt-1">Jahre Erfahrung</div>
-            </div>
-            <div className="rounded-xl border border-yellow-400/30 bg-yellow-400/10 p-3 sm:p-4">
-              <div className="text-2xl sm:text-3xl font-bold">500+</div>
-              <div className="text-xs sm:text-sm text-yellow-100/80 mt-1">Zufriedene Kunden</div>
-            </div>
-            <div className="rounded-xl border border-yellow-400/30 bg-yellow-400/10 p-3 sm:p-4">
-              <div className="text-2xl sm:text-3xl font-bold">24/7</div>
-              <div className="text-xs sm:text-sm text-yellow-100/80 mt-1">Service & Tracking</div>
+            <div className="flex w-full flex-col gap-4 lg:max-w-sm">
+              {highlightCards.map(({ icon: Icon, title, description }) => (
+                <div
+                  key={title}
+                  className="tilt-card rounded-3xl border border-white/12 py-6 card-padding-x shadow-xl shadow-black/35"
+                  style={{
+                    background: "linear-gradient(145deg, rgba(255,215,0,0.18), rgba(22,28,43,0.85))",
+                    backdropFilter: "blur(18px)",
+                  }}
+                >
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-black/60 text-yellow-300 shadow-inner shadow-yellow-500/30">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-base font-semibold text-white">{title}</h3>
+                  </div>
+                  <p className="text-sm leading-relaxed text-white/70">{description}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

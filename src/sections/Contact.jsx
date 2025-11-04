@@ -1,233 +1,350 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Mail, Phone, MapPin, Send, CheckCircle } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { Mail, Phone, MapPin, Clock, FileText, Send } from "lucide-react";
+import { useSection } from "../hooks/useWordPressData.js";
+import { sendContactEmail, sanitizePhoneForHref } from "../utils/contact-service.js";
 
-export default function Contact() {
-  const sectionRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [driverVisible, setDriverVisible] = useState(false);
+const INITIAL_FORM_STATE = {
+  name: "",
+  company: "",
+  email: "",
+  phone: "",
+  message: "",
+};
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    company: "",
-    phone: "",
-    message: "",
-  });
-  const [isSubmitted, setIsSubmitted] = useState(false);
+export default function Contact({ data }) {
+  const fallbackData = useSection("contact");
+  const contactData = useMemo(() => {
+    if (!data) {
+      return fallbackData;
+    }
 
-  // Sichtbarkeit via IntersectionObserver (performanter als Scroll-Events)
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        const vis = entry.isIntersecting;
-        setIsVisible(vis);
-        if (vis) {
-          // Fahrer leicht verzögert anzeigen
-          const t = setTimeout(() => setDriverVisible(true), 700);
-          return () => clearTimeout(t);
-        }
+    return {
+      ...fallbackData,
+      ...data,
+      info: {
+        ...fallbackData.info,
+        ...data.info,
+        address: {
+          ...fallbackData.info?.address,
+          ...data.info?.address,
+        },
+        phones: data.info?.phones ?? fallbackData.info?.phones,
+        emails: data.info?.emails ?? fallbackData.info?.emails,
       },
-      { root: null, threshold: 0.15 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+      officeHours: data.officeHours ?? fallbackData.officeHours,
+      availability: {
+        ...fallbackData.availability,
+        ...data.availability,
+      },
+      imprint: data.imprint ?? fallbackData.imprint,
+      form: {
+        ...fallbackData.form,
+        ...data.form,
+      },
+      cc: data.cc ?? fallbackData.cc,
+    };
+  }, [fallbackData, data]);
+  const [formValues, setFormValues] = useState(INITIAL_FORM_STATE);
+  const [status, setStatus] = useState("idle");
+  const [feedback, setFeedback] = useState(null);
 
-  // Formular
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: "", email: "", company: "", phone: "", message: "" });
-    }, 3000);
+  const handleChange = (field) => (event) => {
+    const value = event.target.value;
+    setFormValues((prev) => ({ ...prev, [field]: value }));
   };
-  const handleInputChange = (e) =>
-    setFormData((s) => ({ ...s, [e.target.name]: e.target.value }));
+
+  const resolvedRecipient = useMemo(() => {
+    if (contactData.recipient) return contactData.recipient;
+    const emailEntry = contactData.info?.emails?.find((entry) => entry?.address) || contactData.info?.emails?.[0];
+    return emailEntry?.address;
+  }, [contactData]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (status === "loading") return;
+
+    if (!resolvedRecipient) {
+      setFeedback({
+        type: "error",
+        title: "Keine Empfänger-Adresse",
+        message: "Es ist keine Zieladresse zum Versenden der Anfrage konfiguriert.",
+      });
+      return;
+    }
+
+    setStatus("loading");
+    setFeedback(null);
+
+    try {
+      await sendContactEmail(
+        {
+          ...formValues,
+          source: typeof window !== "undefined" ? window.location.href : "Kontaktformular",
+        },
+        {
+          recipient: resolvedRecipient,
+          cc: contactData.cc,
+          endpoint: contactData.endpoint,
+        }
+      );
+
+      setStatus("success");
+      setFeedback({
+        type: "success",
+        title: contactData.form?.successTitle || "Danke für Ihre Nachricht!",
+        message: contactData.form?.successMessage || "Wir melden uns schnellstmöglich bei Ihnen.",
+      });
+      setFormValues(INITIAL_FORM_STATE);
+    } catch (error) {
+      console.error("Kontaktformular Fehler", error);
+      setStatus("error");
+      setFeedback({
+        type: "error",
+        title: contactData.form?.errorTitle || "Versand fehlgeschlagen",
+        message:
+          contactData.form?.errorMessage ||
+          "Bitte versuchen Sie es erneut oder kontaktieren Sie uns telefonisch.",
+      });
+    }
+  };
+
+  const contactDetails = useMemo(() => {
+    return [
+      {
+        icon: MapPin,
+        title: contactData.info?.address?.label || "Adresse",
+        entries: (contactData.info?.address?.lines || []).map((line) => ({ text: line })),
+      },
+      {
+        icon: Phone,
+        title: "Telefon",
+        entries: (contactData.info?.phones || []).map(({ label, number }) => ({
+          text: `${label ? `${label}: ` : ""}${number || ""}`.trim(),
+          href: sanitizePhoneForHref(number),
+        })),
+      },
+      {
+        icon: Mail,
+        title: "E-Mail",
+        entries: (contactData.info?.emails || []).map(({ label, address }) => ({
+          text: `${label ? `${label}: ` : ""}${address || ""}`.trim(),
+          href: address ? `mailto:${address}` : undefined,
+        })),
+      },
+    ].filter((section) => section.entries.length > 0);
+  }, [contactData]);
 
   return (
-    <section
-      id="contact"
-      ref={sectionRef}
-      className="relative overflow-hidden bg-[#0a0a0a] text-white"
-    >
-      <div className="mx-auto max-w-7xl px-4 py-16 md:py-24">
-    
-
-        {/* Titel */}
-        <div
-          className={`text-center mb-10 md:mb-14 transition-all duration-700
-          ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold">
-            Jetzt <span className="text-[#FFD700]">Kontakt</span> aufnehmen
+    <section id="kontakt" className="relative overflow-hidden py-20 text-white">
+      <div className="mx-auto w-full max-w-6xl px-6">
+        <div className="hover-tilt transform-3d rounded-2xl py-6 card-padding-x text-center mb-8 border border-white/12 backdrop-blur-md bg-white/5 shadow-lg shadow-black/10">
+          <h2 className="text-3xl sm:text-4xl font-bold text-yellow-ctm">
+            {contactData.title || "Jetzt Kontakt aufnehmen"}
           </h2>
-          <p className="mt-3 text-sm sm:text-base md:text-lg text-white/80 max-w-2xl mx-auto">
-            Lassen Sie uns über Ihre Transportbedürfnisse sprechen.
+          <p className="mt-4 text-base sm:text-lg text-white/80 max-w-3xl mx-auto">
+            {contactData.subtitle || "Wir sind für Sie da."}
           </p>
         </div>
 
-        {/* Grid: Formular + Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
-          {/* Formular */}
-          <div
-            className={`transition-all duration-700
-            ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2"}`}
-          >
-            <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 sm:p-7 md:p-8">
-              <h3 className="text-xl sm:text-2xl font-semibold mb-5">Angebot anfordern</h3>
-
-              {isSubmitted ? (
-                <div className="text-center py-10">
-                  <CheckCircle className="w-12 h-12 sm:w-14 sm:h-14 text-[#FFD700] mx-auto mb-3" />
-                  <h4 className="text-lg sm:text-xl font-semibold mb-1">Vielen Dank!</h4>
-                  <p className="text-white/80">Wir melden uns schnellstmöglich bei Ihnen.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-white/80 text-sm mb-1.5">Name *</label>
-                      <input
-                        type="text"
-                        name="name"
-                        required
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className="w-full px-3.5 py-2.5 bg-[#111] border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#FFD700]"
-                        placeholder="Ihr Name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-white/80 text-sm mb-1.5">Unternehmen</label>
-                      <input
-                        type="text"
-                        name="company"
-                        value={formData.company}
-                        onChange={handleInputChange}
-                        className="w-full px-3.5 py-2.5 bg-[#111] border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#FFD700]"
-                        placeholder="Ihr Unternehmen"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-white/80 text-sm mb-1.5">E-Mail *</label>
-                      <input
-                        type="email"
-                        name="email"
-                        required
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className="w-full px-3.5 py-2.5 bg-[#111] border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#FFD700]"
-                        placeholder="ihre@email.de"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-white/80 text-sm mb-1.5">Telefon</label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        className="w-full px-3.5 py-2.5 bg-[#111] border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#FFD700]"
-                        placeholder="06131 123456"
-                      />
-                    </div>
-                  </div>
-
+        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] items-start">
+          {/* Kontaktformular ohne 3D Hover */}
+          <div className="card-gradient-hero py-10 card-padding-x shadow-2xl">
+            <form className="space-y-7" onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-5">
                   <div>
-                    <label className="block text-white/80 text-sm mb-1.5">Nachricht *</label>
-                    <textarea
-                      name="message"
+                    <label htmlFor="contact-name" className="block text-base font-semibold text-white mb-1">Name*</label>
+                    <input
+                      id="contact-name"
+                      name="name"
+                      type="text"
                       required
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      rows={5}
-                      className="w-full px-3.5 py-2.5 bg-[#111] border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#FFD700] resize-none"
-                      placeholder="Beschreiben Sie Ihre Transportanforderungen..."
+                      autoComplete="name"
+                      value={formValues.name}
+                      onChange={handleChange("name")}
+                      placeholder="Ihr Name"
+                      className="w-full rounded-xl bg-white/10 border border-white/15 px-4 py-2.5 text-white text-base font-normal focus:border-yellow-400 focus:ring-2 focus:ring-yellow-300/30 transition"
                     />
                   </div>
+                  <div>
+                    <label htmlFor="contact-email" className="block text-base font-semibold text-white mb-1">E-Mail*</label>
+                    <input
+                      id="contact-email"
+                      name="email"
+                      type="email"
+                      required
+                      autoComplete="email"
+                      value={formValues.email}
+                      onChange={handleChange("email")}
+                      placeholder="ihre@email.de"
+                      className="w-full rounded-xl bg-white/10 border border-white/15 px-4 py-2.5 text-white text-base font-normal focus:border-yellow-400 focus:ring-2 focus:ring-yellow-300/30 transition"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-5">
+                  <div>
+                    <label htmlFor="contact-company" className="block text-base font-semibold text-white mb-1">Unternehmen</label>
+                    <input
+                      id="contact-company"
+                      name="company"
+                      type="text"
+                      autoComplete="organization"
+                      value={formValues.company}
+                      onChange={handleChange("company")}
+                      placeholder="Ihr Unternehmen"
+                      className="w-full rounded-xl bg-white/10 border border-white/15 px-4 py-2.5 text-white text-base font-normal focus:border-yellow-400 focus:ring-2 focus:ring-yellow-300/30 transition"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="contact-phone" className="block text-base font-semibold text-white mb-1">Telefon</label>
+                    <input
+                      id="contact-phone"
+                      name="phone"
+                      type="tel"
+                      autoComplete="tel"
+                      value={formValues.phone}
+                      onChange={handleChange("phone")}
+                      placeholder="06131 123456"
+                      className="w-full rounded-xl bg-white/10 border border-white/15 px-4 py-2.5 text-white text-base font-normal focus:border-yellow-400 focus:ring-2 focus:ring-yellow-300/30 transition"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="contact-message" className="block text-base font-semibold text-white mb-1">Nachricht*</label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  required
+                  rows={5}
+                  value={formValues.message}
+                  onChange={handleChange("message")}
+                  placeholder="Beschreiben Sie Ihre Transportanforderungen..."
+                  className="w-full rounded-xl bg-white/10 border border-white/15 px-4 py-2.5 text-white text-base font-normal focus:border-yellow-400 focus:ring-2 focus:ring-yellow-300/30 transition resize-none"
+                />
+              </div>
 
-                  <button
-                    type="submit"
-                    className="w-full px-6 py-3 bg-[#FFD700] text-black font-semibold rounded-lg hover:bg-yellow-300 transition-transform duration-200 active:scale-[.98] flex items-center justify-center gap-2"
-                  >
-                    <Send className="w-5 h-5" />
-                    <span>Anfrage senden</span>
-                  </button>
-                </form>
+              {feedback && (
+                <div
+                  className={`rounded-2xl border px-4 py-3 text-sm ${
+                    feedback.type === "success"
+                      ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
+                      : "border-red-400/40 bg-red-500/10 text-red-100"
+                  }`}
+                  aria-live="polite"
+                >
+                  <p className="font-semibold">{feedback.title}</p>
+                  <p className="mt-1 text-white/80">{feedback.message}</p>
+                </div>
               )}
-            </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-6">
+                <p className="text-xs text-white/60 max-w-xs">
+                  {contactData.form?.privacyNotice ||
+                    "Mit dem Absenden stimmen Sie der Verarbeitung Ihrer Daten zu."}
+                </p>
+                <button
+                  type="submit"
+                  className="ctm-btn--primary btn-3d inline-flex items-center gap-2 rounded-2xl px-7 py-3 font-semibold text-black shadow-lg shadow-yellow-900/30 hover:scale-105 transition-transform"
+                  disabled={status === "loading"}
+                >
+                  {status === "loading" ? (
+                    <span>Senden...</span>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" />
+                      <span>{contactData.form?.submitLabel || "Anfrage senden"}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
 
-          {/* Kontakt-Infos */}
-          <div
-            className={`space-y-6 md:space-y-8 transition-all duration-700
-            ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2"}`}
-          >
-            <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 sm:p-7 md:p-8">
-              <h3 className="text-xl sm:text-2xl font-semibold mb-5">Kontaktdaten</h3>
+          <div className="space-y-8">
+            <div className="glass-strong hover-lift transform-3d rounded-3xl border border-white/12 py-7 card-padding-x shadow-xl shadow-black/35" style={{
+              background: "linear-gradient(145deg, rgba(255,215,0,0.18), rgba(22,28,43,0.85))",
+              backdropFilter: "blur(18px)"
+            }}>
+              <h3 className="text-lg font-semibold text-white mb-4">Kontaktdaten</h3>
               <div className="space-y-5">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-[#FFD700] mt-1" />
-                  <div className="text-sm sm:text-base">
-                    <h4 className="font-semibold text-white mb-1">Adresse</h4>
-                    <p className="text-white/80">
-                      Container Transport Mainz GmbH<br />Industriestraße 42<br />55116 Mainz
-                    </p>
+                {contactDetails.map(({ icon: Icon, title, entries }) => (
+                  <div key={title} className="flex items-start gap-4">
+                    <div className="icon-3d icon-glow rounded-2xl p-3 text-yellow-300">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="space-y-1 text-sm text-white/80">
+                      <p className="font-semibold text-white">{title}</p>
+                      {entries.map((entry, idx) => (
+                        <p key={idx}>
+                          {entry.href ? (
+                            <a
+                              href={entry.href}
+                              className="transition-colors hover:text-yellow-200"
+                              rel="noopener noreferrer"
+                            >
+                              {entry.text}
+                            </a>
+                          ) : (
+                            entry.text
+                          )}
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-[#FFD700] mt-1" />
-                  <div className="text-sm sm:text-base">
-                    <h4 className="font-semibold text-white mb-1">Telefon</h4>
-                    <p className="text-white/80">
-                      +49 (0) 6131 / 123 456<br />Notfall: +49 (0) 151 / 987 654
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-[#FFD700] mt-1" />
-                  <div className="text-sm sm:text-base">
-                    <h4 className="font-semibold text-white mb-1">E-Mail</h4>
-                    <p className="text-white/80">
-                      info@ctm-mainz.de<br />service@ctm-mainz.de
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 sm:p-7 md:p-8">
-              <h3 className="text-xl sm:text-2xl font-semibold mb-5">Öffnungszeiten</h3>
-              <div className="space-y-2.5 text-sm sm:text-base">
-                <div className="flex justify-between"><span className="text-white/80">Montag - Freitag</span><span className="text-white font-medium">6:00 - 18:00 Uhr</span></div>
-                <div className="flex justify-between"><span className="text-white/80">Samstag</span><span className="text-white font-medium">8:00 - 14:00 Uhr</span></div>
-                <div className="flex justify-between"><span className="text-white/80">Sonntag</span><span className="text-white/50">Geschlossen</span></div>
-                <div className="mt-3 pt-3 border-t border-white/10 flex justify-between">
-                  <span className="text-[#FFD700] font-medium">24/7 Notdienst</span>
-                  <span className="text-[#FFD700] font-medium">Verfügbar</span>
+            <div className="glass-strong hover-lift transform-3d rounded-3xl border border-white/12 py-7 card-padding-x shadow-xl shadow-black/35" style={{
+              background: "linear-gradient(145deg, rgba(255,215,0,0.18), rgba(22,28,43,0.85))",
+              backdropFilter: "blur(18px)"
+            }}>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-1">Öffnungszeiten</h3>
+                  <p className="text-sm text-white/60">Unsere Disposition ist zu diesen Zeiten besetzt.</p>
+                </div>
+                <div className="icon-3d icon-glow rounded-2xl p-3 text-yellow-300">
+                  <Clock className="h-5 w-5" />
                 </div>
               </div>
+              <div className="mt-4 space-y-2 text-sm text-white/80">
+                {contactData.officeHours?.map(({ day, time }) => (
+                  <div key={day} className="flex items-center justify-between rounded-xl bg-white/4 px-3 py-2">
+                    <span>{day}</span>
+                    <span className="text-white">{time}</span>
+                  </div>
+                ))}
+              </div>
+              {contactData.availability?.label && (
+                <div className="mt-4 flex items-center justify-between rounded-xl border border-yellow-400/30 bg-yellow-500/10 px-3 py-2 text-sm font-semibold text-yellow-200">
+                  <span>{contactData.availability.label}</span>
+                  <span>{contactData.availability.status}</span>
+                </div>
+              )}
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-sm p-6 sm:p-7 md:p-8">
-              <h3 className="text-xl sm:text-2xl font-semibold mb-5">Impressum</h3>
-              <div className="space-y-2.5 text-xs sm:text-sm text-white/80">
-                <p>
-                  <strong className="text-white">Container Transport Mainz GmbH</strong><br />
-                  Geschäftsführer: Hans Müller · HRB 12345 · Amtsgericht Mainz
-                </p>
-                <p>
-                  <strong className="text-white">USt-IdNr.:</strong> DE123456789 · <strong className="text-white">Steuer-Nr.:</strong> 12/345/67890
-                </p>
-                <p className="pt-2 border-t border-white/10">
-                  <strong className="text-white">Versicherung:</strong> Allianz Versicherung AG · Transportversicherung bis 5 Mio. EUR
-                </p>
+            <div className="glass-strong hover-lift transform-3d rounded-3xl border border-white/12 py-7 card-padding-x shadow-xl shadow-black/35" style={{
+              background: "linear-gradient(145deg, rgba(255,215,0,0.18), rgba(22,28,43,0.85))",
+              backdropFilter: "blur(18px)"
+            }}>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-1">Impressum</h3>
+                  <p className="text-sm text-white/60">Wichtige rechtliche Angaben auf einen Blick.</p>
+                </div>
+                <div className="icon-3d icon-glow rounded-2xl p-3 text-yellow-300">
+                  <FileText className="h-5 w-5" />
+                </div>
+              </div>
+              <div className="mt-4 space-y-2 text-sm text-white/80">
+                {(Array.isArray(contactData.imprint) ? contactData.imprint : []).map(({ label, value }) => (
+                  <div key={label} className="rounded-xl bg-white/4 px-3 py-2">
+                    <p className="font-semibold text-white">{label}</p>
+                    <p className="mt-0.5 text-white/80">{value}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
