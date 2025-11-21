@@ -21,6 +21,19 @@ export const iconMap = {
 
 // Standalone React App Data
 export const STANDALONE_DATA = {
+  header: {
+    logo_text: "CTM",
+    logo_bg_color: "#FFD700", 
+    logo_text_color: "#000000",
+    navigation: [
+      { text: "Startseite", href: "#hero", icon: "Home" },
+      { text: "Leistungen", href: "#services", icon: "Package" },
+      { text: "Flotte", href: "#flotte", icon: "Truck" },
+      { text: "Über uns", href: "#geschichte", icon: "Users" },
+      { text: "Kontakt", href: "#kontakt", icon: "MessageCircle", isPrimary: true }
+    ]
+  },
+  
   hero: {
     badge: {
       text: "Spedition · Containerlogistik",

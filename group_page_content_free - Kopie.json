@@ -1,0 +1,159 @@
+{
+  "key": "group_page_content_free",
+  "title": "Seiteninhalte (Standardfelder)",
+  "fields": [
+    
+    // =============================================================
+    // Sektion 1: HERO
+    // =============================================================
+    { "key": "field_hero_tab", "label": "1. Hero Sektion", "name": "", "type": "tab", "placement": "top" },
+    { "key": "field_hero_tagline", "label": "Tagline (Oberer Text)", "name": "hero_tagline", "type": "text", "wrapper": { "width": "50" } },
+    { "key": "field_hero_headline", "label": "Titel (H1)", "name": "hero_headline", "type": "textarea", "rows": 2 },
+    { "key": "field_hero_subtext", "label": "Untertext", "name": "hero_subtext", "type": "textarea", "rows": 3 },
+
+    // Hero Buttons (Gruppe ersetzt Repeater)
+    { "key": "field_hero_btn1_text", "label": "Button 1 Text", "name": "hero_btn1_text", "type": "text", "wrapper": { "width": "33" } },
+    { "key": "field_hero_btn1_link", "label": "Button 1 Link-ID", "name": "hero_btn1_link", "type": "text", "wrapper": { "width": "33" } },
+    { "key": "field_hero_btn2_text", "label": "Button 2 Text", "name": "hero_btn2_text", "type": "text", "wrapper": { "width": "33" } },
+    
+    // Hero Highlight Cards (3x dupliziert, ersetzt Repeater)
+    { "key": "field_hero_cards_heading", "label": "Highlight Cards (Max. 3)", "name": "", "type": "message", "message": "Die folgenden 9 Felder bilden die 3 Kacheln ab." },
+    
+    // Card 1
+    { "key": "field_hero_card1_icon", "label": "Card 1: Icon Name", "name": "hero_card1_icon", "type": "text", "wrapper": { "width": "33" } },
+    { "key": "field_hero_card1_title", "label": "Card 1: Titel", "name": "hero_card1_title", "type": "text", "wrapper": { "width": "33" } },
+    { "key": "field_hero_card1_desc", "label": "Card 1: Beschreibung", "name": "hero_card1_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "34" } },
+
+    // Card 2
+    { "key": "field_hero_card2_icon", "label": "Card 2: Icon Name", "name": "hero_card2_icon", "type": "text", "wrapper": { "width": "33" } },
+    { "key": "field_hero_card2_title", "label": "Card 2: Titel", "name": "hero_card2_title", "type": "text", "wrapper": { "width": "33" } },
+    { "key": "field_hero_card2_desc", "label": "Card 2: Beschreibung", "name": "hero_card2_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "34" } },
+
+    // Card 3
+    { "key": "field_hero_card3_icon", "label": "Card 3: Icon Name", "name": "hero_card3_icon", "type": "text", "wrapper": { "width": "33" } },
+    { "key": "field_hero_card3_title", "label": "Card 3: Titel", "name": "hero_card3_title", "type": "text", "wrapper": { "width": "33" } },
+    { "key": "field_hero_card3_desc", "label": "Card 3: Beschreibung", "name": "hero_card3_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "34" } },
+
+
+    // =============================================================
+    // Sektion 2: LEISTUNGEN
+    // =============================================================
+    { "key": "field_services_tab", "label": "2. Unsere Leistungen", "name": "", "type": "tab", "placement": "top" },
+    { "key": "field_services_title", "label": "Sektions-Titel", "name": "services_title", "type": "text" },
+    { "key": "field_services_subtitle", "label": "Einleitungstext", "name": "services_subtitle", "type": "textarea", "rows": 2 },
+    
+    // Leistungs-Kacheln (5x dupliziert, ersetzt Repeater)
+    { "key": "field_services_cards_heading", "label": "Leistungs-Kacheln (Max. 5)", "name": "", "type": "message", "message": "Duplizierte Felder für die Leistungs-Kacheln." },
+    
+    // Card 1
+    { "key": "field_service1_icon", "label": "Leistung 1: Icon", "name": "service1_icon", "type": "text", "wrapper": { "width": "20" } },
+    { "key": "field_service1_title", "label": "Leistung 1: Titel", "name": "service1_title", "type": "text", "wrapper": { "width": "40" } },
+    { "key": "field_service1_desc", "label": "Leistung 1: Beschreibung", "name": "service1_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } },
+
+    // Card 2
+    { "key": "field_service2_icon", "label": "Leistung 2: Icon", "name": "service2_icon", "type": "text", "wrapper": { "width": "20" } },
+    { "key": "field_service2_title", "label": "Leistung 2: Titel", "name": "service2_title", "type": "text", "wrapper": { "width": "40" } },
+    { "key": "field_service2_desc", "label": "Leistung 2: Beschreibung", "name": "service2_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } },
+    
+    // Card 3
+    { "key": "field_service3_icon", "label": "Leistung 3: Icon", "name": "service3_icon", "type": "text", "wrapper": { "width": "20" } },
+    { "key": "field_service3_title", "label": "Leistung 3: Titel", "name": "service3_title", "type": "text", "wrapper": { "width": "40" } },
+    { "key": "field_service3_desc", "label": "Leistung 3: Beschreibung", "name": "service3_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } },
+    
+    // Card 4
+    { "key": "field_service4_icon", "label": "Leistung 4: Icon", "name": "service4_icon", "type": "text", "wrapper": { "width": "20" } },
+    { "key": "field_service4_title", "label": "Leistung 4: Titel", "name": "service4_title", "type": "text", "wrapper": { "width": "40" } },
+    { "key": "field_service4_desc", "label": "Leistung 4: Beschreibung", "name": "service4_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } },
+    
+    // Card 5
+    { "key": "field_service5_icon", "label": "Leistung 5: Icon", "name": "service5_icon", "type": "text", "wrapper": { "width": "20" } },
+    { "key": "field_service5_title", "label": "Leistung 5: Titel", "name": "service5_title", "type": "text", "wrapper": { "width": "40" } },
+    { "key": "field_service5_desc", "label": "Leistung 5: Beschreibung", "name": "service5_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } },
+
+
+    // =============================================================
+    // Sektion 3: FLOTTE
+    // =============================================================
+    { "key": "field_fleet_tab", "label": "3. Flotte", "name": "", "type": "tab", "placement": "top" },
+    { "key": "field_fleet_title", "label": "Sektions-Titel", "name": "fleet_title", "type": "text" },
+    { "key": "field_fleet_subtitle", "label": "Untertitel", "name": "fleet_subtitle", "type": "textarea", "rows": 2 },
+
+    // Flotten-Statistiken (4x dupliziert)
+    { "key": "field_fleet_stats_heading", "label": "Flotten-Statistiken (Max. 4)", "name": "", "type": "message", "message": "Geben Sie bis zu 4 Statistiken ein." },
+    
+    { "key": "field_fleet_stat1_label", "label": "Statistik 1: Label", "name": "fleet_stat1_label", "type": "text", "wrapper": { "width": "25" } },
+    { "key": "field_fleet_stat1_target", "label": "Statistik 1: Wert", "name": "fleet_stat1_target", "type": "text", "wrapper": { "width": "25" } },
+    { "key": "field_fleet_stat2_label", "label": "Statistik 2: Label", "name": "fleet_stat2_label", "type": "text", "wrapper": { "width": "25" } },
+    { "key": "field_fleet_stat2_target", "label": "Statistik 2: Wert", "name": "fleet_stat2_target", "type": "text", "wrapper": { "width": "25" } },
+
+    { "key": "field_fleet_stat3_label", "label": "Statistik 3: Label", "name": "fleet_stat3_label", "type": "text", "wrapper": { "width": "25" } },
+    { "key": "field_fleet_stat3_target", "label": "Statistik 3: Wert", "name": "fleet_stat3_target", "type": "text", "wrapper": { "width": "25" } },
+    { "key": "field_fleet_stat4_label", "label": "Statistik 4: Label", "name": "fleet_stat4_label", "type": "text", "wrapper": { "width": "25" } },
+    { "key": "field_fleet_stat4_target", "label": "Statistik 4: Wert", "name": "fleet_stat4_target", "type": "text", "wrapper": { "width": "25" } },
+
+
+    // =============================================================
+    // Sektion 4: GESCHICHTE
+    // =============================================================
+    { "key": "field_history_tab", "label": "4. Geschichte", "name": "", "type": "tab", "placement": "top" },
+    { "key": "field_history_title", "label": "Sektions-Titel", "name": "history_title", "type": "text" },
+    { "key": "field_history_subtitle", "label": "Untertitel", "name": "history_subtitle", "type": "textarea", "rows": 2 },
+    { "key": "field_history_content", "label": "Haupttext", "name": "history_content", "type": "wysiwyg" }, // Erlaubt einfache Formatierung
+    
+    // Meilensteine (3x dupliziert, ersetzt Repeater)
+    { "key": "field_history_milestones_heading", "label": "Meilensteine (Max. 3)", "name": "", "type": "message", "message": "Geben Sie bis zu 3 Meilensteine ein." },
+    
+    { "key": "field_milestone1_year", "label": "M1: Jahr", "name": "milestone1_year", "type": "text", "wrapper": { "width": "20" } },
+    { "key": "field_milestone1_title", "label": "M1: Titel", "name": "milestone1_title", "type": "text", "wrapper": { "width": "40" } },
+    { "key": "field_milestone1_desc", "label": "M1: Beschreibung", "name": "milestone1_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } },
+
+    { "key": "field_milestone2_year", "label": "M2: Jahr", "name": "milestone2_year", "type": "text", "wrapper": { "width": "20" } },
+    { "key": "field_milestone2_title", "label": "M2: Titel", "name": "milestone2_title", "type": "text", "wrapper": { "width": "40" } },
+    { "key": "field_milestone2_desc", "label": "M2: Beschreibung", "name": "milestone2_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } },
+
+    { "key": "field_milestone3_year", "label": "M3: Jahr", "name": "milestone3_year", "type": "text", "wrapper": { "width": "20" } },
+    { "key": "field_milestone3_title", "label": "M3: Titel", "name": "milestone3_title", "type": "text", "wrapper": { "width": "40" } },
+    { "key": "field_milestone3_desc", "label": "M3: Beschreibung", "name": "milestone3_desc", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } },
+
+
+    // =============================================================
+    // Sektion 5: KONTAKT
+    // =============================================================
+    { "key": "field_contact_tab", "label": "5. Kontakt", "name": "", "type": "tab", "placement": "top" },
+    { "key": "field_contact_title", "label": "Sektions-Titel", "name": "contact_title", "type": "text" },
+    { "key": "field_contact_subtitle", "label": "Untertitel", "name": "contact_subtitle", "type": "textarea", "rows": 2 },
+
+    // Kontaktdaten (3x dupliziert)
+    { "key": "field_contact_info_heading", "label": "Kontaktdaten (Max. 3 Blöcke)", "name": "", "type": "message", "message": "Adresse, Telefon und E-Mail können hier einzeln eingegeben werden." },
+
+    { "key": "field_contact_block1_title", "label": "Kontakt Block 1 Titel (z.B. Adresse)", "name": "contact_block1_title", "type": "text", "wrapper": { "width": "50" } },
+    { "key": "field_contact_block1_content", "label": "Kontakt Block 1 Inhalt", "name": "contact_block1_content", "type": "textarea", "rows": 3, "wrapper": { "width": "50" } },
+
+    { "key": "field_contact_block2_title", "label": "Kontakt Block 2 Titel (z.B. Disposition)", "name": "contact_block2_title", "type": "text", "wrapper": { "width": "50" } },
+    { "key": "field_contact_block2_content", "label": "Kontakt Block 2 Inhalt", "name": "contact_block2_content", "type": "textarea", "rows": 3, "wrapper": { "width": "50" } },
+
+    { "key": "field_contact_block3_title", "label": "Kontakt Block 3 Titel (z.B. E-Mail)", "name": "contact_block3_title", "type": "text", "wrapper": { "width": "50" } },
+    { "key": "field_contact_block3_content", "label": "Kontakt Block 3 Inhalt", "name": "contact_block3_content", "type": "textarea", "rows": 3, "wrapper": { "width": "50" } },
+
+    // Öffnungszeiten
+    { "key": "field_contact_hours_heading", "label": "Öffnungszeiten (3 Zeilen)", "name": "", "type": "message", "message": "Geben Sie bis zu 3 Öffnungszeitenzeilen ein." },
+    { "key": "field_contact_hours1", "label": "Stunde 1 (z.B. Mo-Fr: 8-17 Uhr)", "name": "contact_hours1", "type": "text" },
+    { "key": "field_contact_hours2", "label": "Stunde 2", "name": "contact_hours2", "type": "text" },
+    { "key": "field_contact_hours3", "label": "Stunde 3", "name": "contact_hours3", "type": "text" }
+  ],
+  "location": [
+    [
+      {
+        "param": "post_type",
+        "operator": "==",
+        "value": "page"
+      }
+    ]
+  ],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "seamless",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true
+}

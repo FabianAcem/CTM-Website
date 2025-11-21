@@ -1,0 +1,127 @@
+{
+  "key": "group_global_content",
+  "title": "Globale Website Inhalte",
+  "fields": [
+    {
+      "key": "field_colors_tab",
+      "label": "Farben",
+      "name": "",
+      "type": "tab"
+    },
+    {
+      "key": "field_primary_color",
+      "label": "Primärfarbe",
+      "name": "primary_color",
+      "type": "color_picker"
+    },
+    {
+      "key": "field_secondary_color",
+      "label": "Sekundärfarbe",
+      "name": "secondary_color",
+      "type": "color_picker"
+    },
+    {
+      "key": "field_text_color",
+      "label": "Textfarbe",
+      "name": "text_color",
+      "type": "color_picker"
+    },
+    {
+      "key": "field_tiles_tab",
+      "label": "Kacheln",
+      "name": "",
+      "type": "tab"
+    },
+    {
+      "key": "field_global_tiles",
+      "label": "Globale Kacheln",
+      "name": "global_tiles",
+      "type": "repeater",
+      "sub_fields": [
+        {
+          "key": "field_icon",
+          "label": "Icon",
+          "name": "icon",
+          "type": "image"
+        },
+        {
+          "key": "field_title",
+          "label": "Titel",
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "key": "field_description",
+          "label": "Beschreibung",
+          "name": "description",
+          "type": "textarea"
+        },
+        {
+          "key": "field_bg_color",
+          "label": "Hintergrundfarbe",
+          "name": "bg_color",
+          "type": "color_picker"
+        },
+        {
+          "key": "field_text_color_inner",
+          "label": "Textfarbe",
+          "name": "text_color",
+          "type": "color_picker"
+        }
+      ]
+    },
+    {
+      "key": "field_buttons_tab",
+      "label": "Buttons",
+      "name": "",
+      "type": "tab"
+    },
+    {
+      "key": "field_global_buttons",
+      "label": "Buttons",
+      "name": "global_buttons",
+      "type": "repeater",
+      "sub_fields": [
+        {
+          "key": "field_button_text",
+          "label": "Button Text",
+          "name": "button_text",
+          "type": "text"
+        },
+        {
+          "key": "field_button_link",
+          "label": "Button Link",
+          "name": "button_link",
+          "type": "url"
+        },
+        {
+          "key": "field_button_color",
+          "label": "Button Hintergrundfarbe",
+          "name": "button_color",
+          "type": "color_picker"
+        },
+        {
+          "key": "field_button_text_color",
+          "label": "Button Textfarbe",
+          "name": "button_text_color",
+          "type": "color_picker"
+        }
+      ]
+    }
+  ],
+  "location": [
+    [
+      {
+        "param": "page",
+        "operator": "==",
+        "value": "1"
+      }
+    ]
+  ],
+  "style": "seamless",
+  "position": "normal",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "hide_on_screen": "",
+  "active": true
+}

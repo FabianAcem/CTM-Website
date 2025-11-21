@@ -1,133 +1,346 @@
-import React from 'react';
-import { Calendar, Award, Users, ArrowRight } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useScrollAnimation, useStaggeredAnimation, slideInClasses, scrollToElement } from "../utils/animations.js";
-import { useSection } from "../hooks/useWordPressData.js";
-import { getIcon } from "../utils/icon-manager.js";
+import { resolveFontSize } from "../utils/fontSize.js";
+import AlexKayserImage from '../assets/CTM OPa.png';
 
+const FALLBACK_DATA = {
+  history_title: "Unsere Geschichte",
+  history_title_color: "#FFD700",
+  history_title_size: "l",
+  history_title_shadow: "0 0 20px rgba(255, 215, 0, 0.3)",
+  history_subtitle: "Über fünf Jahrzehnte Erfahrung – vom Familienunternehmen zum Vorreiter auf dem Rhein.",
+  history_subtitle_color: "rgba(255,255,255,0.75)",
+  history_subtitle_size: "m",
+  history_portrait_image: "",
+  history_portrait_name: "Alex Kayser",
+  history_portrait_role: "Pionier des kombinierten Transports",
+  history_portrait_caption_color: "rgba(255,255,255,0.8)",
+  history_portrait_border_color: "rgba(255,215,0,0.3)",
+  history_portrait_shadow: "0 0 20px rgba(255, 215, 0, 0.4)",
+  history_timeline_card_bg: "rgba(255,255,255,0.04)",
+  history_timeline_card_hover_bg: "rgba(255,255,255,0.06)",
+  history_timeline_title_color: "#FFD700",
+  history_timeline_text_color: "rgba(255,255,255,0.82)",
+  history_timeline_title_size: "s",
+  history_timeline_text_size: "xs",
+  history_timeline_border_color: "rgba(255,215,0,0.12)",
+  history_timeline_line_color: "#FFD700",
+  history_timeline_glow_shadow: "0 0 20px rgba(255, 215, 0, 0.3)",
+  history_timeline_glow_shadow_hover: "0 0 30px rgba(255, 215, 0, 0.5)",
+  history_cta_text: "Unsere Werte entdecken",
+  history_cta_link: "werte",
+  history_cta_bg: "#FFD700",
+  history_cta_text_color: "#000000",
+  history_cta_size: "s",
+  history_cta_border: "",
+  history_item_1_year: "1967",
+  history_item_1_title: "Die Visionäre Gründung",
+  history_item_1_desc: "Alex Kayser gründet Container Terminals Mainz (CTM) und bringt die Idee des modernen Containertransports auf den Rhein.",
+  history_item_1_align: "left",
+  history_item_2_year: "1970",
+  history_item_2_title: "Der Rhein-Pionier",
+  history_item_2_desc: "Mit den ersten Großschiffen und der MS CHRITSA KAYSER beginnt CTM den kombinierten LKW-Wasserweg-Transport und etabliert sich als Vorreiter.",
+  history_item_2_align: "right",
+  history_item_3_year: "1992",
+  history_item_3_title: "Wachstum und Etablierung",
+  history_item_3_desc: "Die Schifffahrtswerft zieht nach Gustavsburg um. CTM festigt seine Position als zuverlässiger Partner für die Region.",
+  history_item_3_align: "left",
+  history_item_4_year: "2024",
+  history_item_4_title: "Neue Ära: Die Söhne",
+  history_item_4_desc: "Jan und Tobias führen das Familienunternehmen mit frischer Energie und Fokus auf nachhaltige Logistik fort.",
+  history_item_4_align: "right"
+};
 
-const HistorySection = () => {
-  const historyData = useSection('history');
+const HistorySection = ({ data }) => {
   const [sectionRef, isVisible] = useScrollAnimation({ threshold: 0.2 });
-  const [timelineRef, visibleTimelineItems] = useStaggeredAnimation(3, 300);
+  const config = useMemo(() => ({ ...FALLBACK_DATA, ...(data || {}) }), [data]);
 
-  // WordPress-editierbare Timeline und Values
-  const timelineData = historyData.timeline || [];
-  const values = historyData.values || [];
+  const timelineItems = useMemo(() => {
+    const items = [];
+    for (let index = 1; index <= 6; index++) {
+      const year = config[`history_item_${index}_year`];
+      const title = config[`history_item_${index}_title`];
+      const description = config[`history_item_${index}_desc`];
+      if (![year, title, description].some(Boolean)) {
+        continue;
+      }
+      const align = (config[`history_item_${index}_align`] || (index % 2 === 1 ? "left" : "right")).toLowerCase();
+      items.push({
+        year: year || "",
+        title: title || "",
+        description: description || "",
+        position: align === "right" ? "right" : "left"
+      });
+    }
+    return items.length ? items : [
+      {
+        year: config.history_item_1_year,
+        title: config.history_item_1_title,
+        description: config.history_item_1_desc,
+        position: (config.history_item_1_align || "left").toLowerCase() === "right" ? "right" : "left"
+      }
+    ];
+  }, [config]);
+
+  const [timelineRef, visibleTimelineItems] = useStaggeredAnimation(
+    Math.max(timelineItems.length, 1),
+    160,
+    {
+      startDelay: 120,
+      rootMargin: '-20% 0px',
+      threshold: 0.25
+    }
+  );
+
+  const styles = useMemo(() => ({
+    titleSize: resolveFontSize(config.history_title_size, "display", "2.6rem"),
+    titleColor: config.history_title_color || "#FFD700",
+    titleShadow: config.history_title_shadow || "0 0 20px rgba(255, 215, 0, 0.3)",
+    subtitleSize: resolveFontSize(config.history_subtitle_size, "body", "1rem"),
+    subtitleColor: config.history_subtitle_color || "rgba(255,255,255,0.75)",
+    portraitBorderColor: config.history_portrait_border_color || "rgba(255,215,0,0.3)",
+    portraitShadow: config.history_portrait_shadow || "0 0 20px rgba(255, 215, 0, 0.4)",
+    portraitCaptionColor: config.history_portrait_caption_color || "rgba(255,255,255,0.8)",
+    timelineCardBg: config.history_timeline_card_bg || "rgba(255,255,255,0.04)",
+    timelineCardHoverBg: config.history_timeline_card_hover_bg || "rgba(255,255,255,0.06)",
+    timelineTitleColor: config.history_timeline_title_color || "#FFD700",
+    timelineTextColor: config.history_timeline_text_color || "rgba(255,255,255,0.82)",
+    timelineTitleSize: resolveFontSize(config.history_timeline_title_size, "body", "1rem"),
+    timelineTextSize: resolveFontSize(config.history_timeline_text_size, "detail", "0.85rem"),
+    timelineBorderColor: config.history_timeline_border_color || "rgba(255,215,0,0.12)",
+    timelineLineColor: config.history_timeline_line_color || "#FFD700",
+    timelineGlowShadow: config.history_timeline_glow_shadow || "0 0 20px rgba(255, 215, 0, 0.3)",
+    timelineGlowShadowHover: config.history_timeline_glow_shadow_hover || "0 0 30px rgba(255, 215, 0, 0.5)",
+    ctaBg: config.history_cta_bg || "#FFD700",
+    ctaTextColor: config.history_cta_text_color || "#000000",
+    ctaSize: resolveFontSize(config.history_cta_size, "body", "0.95rem"),
+    ctaBorder: config.history_cta_border || ""
+  }), [config]);
+
+  const portraitImage = config.history_portrait_image || AlexKayserImage;
+  const hasCTA = Boolean(config.history_cta_text);
+  const ctaTarget = (config.history_cta_link === "flotte"
+    ? "werte"
+    : (config.history_cta_link || "werte"));
 
   return (
     <section 
-      id="about" 
+      id="geschichte" 
       ref={sectionRef}
-      className="min-h-screen flex items-center relative overflow-hidden text-white py-20 lg:py-32"
+      className="viewport-section relative overflow-hidden text-white"
     >
-      <div className="container mx-auto px-6 max-w-7xl w-full">
-        {/* Header mit glasmorphism */}
-        <div className={`text-center mb-10 lg:mb-12 ${slideInClasses.fromLeft.transition} ${
+      {/* Subtile Hintergrund-Textur */}
+      <style>{`
+        .paper-texture {
+          background-image: 
+            radial-gradient(circle at 1px 1px, rgba(139, 115, 85, 0.05) 1px, transparent 0);
+          background-size: 20px 20px;
+        }
+        
+        .timeline-line {
+          background: linear-gradient(180deg, transparent 0%, ${styles.timelineLineColor} 10%, ${styles.timelineLineColor} 90%, transparent 100%);
+        }
+
+        .milestone-glow {
+          box-shadow: ${styles.timelineGlowShadow};
+          transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .milestone-glow:hover {
+          box-shadow: ${styles.timelineGlowShadowHover};
+          transform: scale(1.02);
+        }
+      `}</style>
+
+      {/* Subtile Papier-Textur */}
+      <div className="absolute inset-0 paper-texture opacity-50"></div>
+
+      <div className="container mx-auto px-6 max-w-7xl w-full h-full flex flex-col justify-center">
+        
+        <div className={`text-center mb-8 ${slideInClasses.fromLeft.transition} ${
           isVisible ? slideInClasses.fromLeft.visible : slideInClasses.fromLeft.hidden
         }`}>
-          <div className="mb-8 hover-tilt transform-3d border border-white/12 rounded-2xl backdrop-blur-md bg-white/5 shadow-lg shadow-black/10 py-6 card-padding-x">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-yellow-ctm mb-3">
-              {historyData.title || "Unsere Geschichte"}
-            </h2>
-            <div className="w-24 h-1 animated-gradient mx-auto mb-4 rounded-full"></div>
-            <p className="text-base lg:text-lg text-white/80 max-w-2xl mx-auto">
-              {historyData.subtitle || "Über 25 Jahre Erfahrung – vom Familienunternehmen zum Marktführer"}
-            </p>
-          </div>
+          <h2
+            className="font-bold mb-2"
+            style={{
+              fontSize: styles.titleSize,
+              color: styles.titleColor,
+              textShadow: styles.titleShadow
+            }}
+          >
+            {config.history_title}
+          </h2>
+          <p
+            className="max-w-3xl mx-auto"
+            style={{
+              fontSize: styles.subtitleSize,
+              color: styles.subtitleColor
+            }}
+          >
+            {config.history_subtitle}
+          </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Content mit glasmorphism */}
-          <div className={`space-y-6 ${slideInClasses.fromLeft.transition} ${
-            isVisible ? slideInClasses.fromLeft.visible : slideInClasses.fromLeft.hidden
-          }`}>
-            <div className="card-modern py-6 card-padding-x space-y-4 text-base lg:text-lg text-white/90 leading-relaxed hover-tilt transform-3d">
-              <div dangerouslySetInnerHTML={{ __html: historyData.content || `
-                <p>Seit über <strong className="text-gradient">25 Jahren</strong> führend im Containertransport. 
-                Was als kleines Familienunternehmen begann, ist heute einer der führenden Spediteure in der Region.</p>
-                <p>Heute transportieren wir <strong className="text-gradient">über 15.000 Tonnen</strong> jährlich 
-                mit einem Team von <strong className="text-white">50+ Experten</strong>, die täglich für 
-                sichere Transporte sorgen.</p>
-              ` }} />
+        <div className={`flex justify-center mb-8 ${slideInClasses.fromLeft.transition} ${
+          isVisible ? slideInClasses.fromLeft.visible : slideInClasses.fromLeft.hidden
+        }`} style={{ animationDelay: '200ms' }}>
+          <div className="text-center">
+            <div className="relative inline-block">
+              <img 
+                src={portraitImage}
+                alt={config.history_portrait_name ? `${config.history_portrait_name} - CTM` : "CTM Portrait"}
+                className="w-24 h-32 object-cover rounded-xl grayscale border-2 shadow-xl"
+                style={{ 
+                  filter: 'grayscale(100%) contrast(1.1)',
+                  borderColor: styles.portraitBorderColor,
+                  boxShadow: styles.portraitShadow
+                }}
+              />
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
             </div>
-
-            {/* Timeline mit floating glass panels - durchsichtige Hintergrund-Kachel */}
-            <div ref={timelineRef} className="py-5 card-padding-x lg:py-6 hover-tilt transform-3d border border-white/12 rounded-2xl backdrop-blur-md bg-white/5 shadow-lg shadow-black/10">
-              <h3 className="text-lg lg:text-xl font-semibold text-white mb-5">Meilensteine</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
-                {timelineData.filter(item => item.visible !== false).map((item, index) => (
-                  <div
-                    key={item.year}
-                    className={`text-center card-modern card-hover hover-lift transform-3d py-4 card-padding-x transition-all duration-700 ${
-                      visibleTimelineItems.includes(index)
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-8"
-                    }`}
-                    style={{ transitionDelay: `${index * 200}ms` }}
-                  >
-                    <div className="w-12 h-12 lg:w-14 lg:h-14 icon-3d icon-glow rounded-full flex items-center justify-center mx-auto mb-3">
-                      {React.createElement(getIcon(item.icon), { className: "w-6 h-6 lg:w-7 lg:h-7 text-gradient" })}
-                    </div>
-                    <div className="text-xl lg:text-2xl font-bold text-gradient mb-1">{item.year}</div>
-                    <div className="text-sm lg:text-base font-semibold text-white mb-1">{item.title}</div>
-                    <div className="text-xs lg:text-sm text-white/70">{item.description}</div>
-                    
-                    {/* Gradient accent */}
-                    <div className="absolute top-2 right-2 w-4 h-4 bg-gradient-to-br from-yellow-400/30 to-transparent rounded-full"></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* CTA mit 3D button */}
-            <div className="pt-2">
-              <button
-                onClick={() => scrollToElement("fleet")}
-                className="ctm-btn--primary btn-3d inline-flex items-center gap-2 px-5 py-2.5 lg:px-6 lg:py-3 font-semibold rounded-xl glow-yellow"
-              >
-                <span className="relative z-10">Unsere Flotte ansehen</span>
-                <ArrowRight className="w-4 h-4 relative z-10" />
-              </button>
-            </div>
-          </div>
-
-          {/* Values mit glasmorphism & 3D stats - durchsichtige Hintergrund-Kachel */}
-            <div className={`py-6 card-padding-x lg:py-8 hover-tilt transform-3d border border-white/12 rounded-2xl backdrop-blur-md bg-white/5 shadow-lg shadow-black/10 transition-all duration-700 delay-500 ${
-            isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
-          }`}>
-            <h3 className="text-xl lg:text-2xl font-semibold text-white mb-6">Unsere Werte</h3>
-            
-            {/* 3D Stats Grid - WordPress-editierbar */}
-            {historyData.stats && historyData.stats.length > 0 && (
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {historyData.stats.filter(stat => stat.visible !== false).map((stat, index) => (
-                  <div key={index} className="card-modern card-hover hover-lift transform-3d text-center py-4 card-padding-x">
-                    <div className="text-xl lg:text-2xl font-bold text-gradient">{stat.number}</div>
-                    <div className="text-xs lg:text-sm text-white/80">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Values List mit glasmorphism bullets - WordPress-editierbar */}
-            <div className="space-y-3">
-              {values.filter(value => value.visible !== false).map((value, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center space-x-3 glass-weak rounded-lg p-2 hover-lift transition-all duration-500 ${
-                    isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
-                  }`}
-                  style={{ transitionDelay: `${800 + index * 100}ms` }}
-                >
-                  <div className="w-2 h-2 animated-gradient rounded-full flex-shrink-0"></div>
-                  <span className="text-sm lg:text-base text-white/90">{value.text}</span>
+            <div className="mt-3">
+              {config.history_portrait_name && (
+                <div className="font-semibold" style={{ color: styles.timelineTitleColor, fontSize: resolveFontSize('s', 'body', '1rem') }}>
+                  {config.history_portrait_name}
                 </div>
-              ))}
+              )}
+              {config.history_portrait_role && (
+                <div className="text-xs" style={{ color: styles.portraitCaptionColor }}>
+                  {config.history_portrait_role}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </div>
 
+        <div className="relative" ref={timelineRef}>
+          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full timeline-line"></div>
+          
+          <div className="space-y-4">
+            {timelineItems.map((milestone, index) => (
+              <div 
+                key={milestone.year}
+                className={`relative transition-all duration-700 ${
+                  visibleTimelineItems.includes(index) 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 translate-y-12'
+                }`}
+                style={{ transitionDelay: `${220 + index * 160}ms` }}
+              >
+                <div className={`absolute left-1/2 top-3 transform -translate-x-1/2 w-3 h-3 bg-yellow-400 rounded-full border-3 border-gray-900 z-10 transition-all duration-500 ${
+                  visibleTimelineItems.includes(index) 
+                    ? 'scale-100' 
+                    : 'scale-0'
+                }`} style={{ transitionDelay: `${160 + index * 160}ms`, backgroundColor: styles.timelineTitleColor }}></div>
+
+                <div className={`grid grid-cols-2 gap-4 ${milestone.position === 'left' ? '' : ''}`}>
+                  {milestone.position === 'left' ? (
+                    <>
+                      <div className="flex justify-end mt-4">
+                        <div
+                          className="milestone-glow backdrop-blur-xl rounded-xl p-3 border transition-all duration-300 text-center"
+                          style={{
+                            background: styles.timelineCardBg,
+                            borderColor: styles.timelineBorderColor
+                          }}
+                        >
+                          {(milestone.title || milestone.year) && (
+                            <div className="flex items-center gap-3 mb-2">
+                              {milestone.title && (
+                                <h3
+                                  className="font-semibold flex-1 text-center"
+                                  style={{ color: styles.timelineTitleColor, fontSize: styles.timelineTitleSize }}
+                                >
+                                  {milestone.title}
+                                </h3>
+                              )}
+                              {milestone.year && (
+                                <div
+                                  className="font-bold shrink-0 text-right"
+                                  style={{ color: styles.timelineTitleColor, fontSize: styles.timelineTitleSize }}
+                                >
+                                  {milestone.year}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {milestone.description && (
+                            <p className="leading-relaxed" style={{ color: styles.timelineTextColor, fontSize: styles.timelineTextSize }}>
+                              {milestone.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div></div>
+                    </>
+                  ) : (
+                    <>
+                      <div></div>
+                      <div className="flex justify-start mt-4">
+                        <div
+                          className="milestone-glow backdrop-blur-xl rounded-xl p-3 border transition-all duration-300 text-center"
+                          style={{
+                            background: styles.timelineCardBg,
+                            borderColor: styles.timelineBorderColor
+                          }}
+                        >
+                          {(milestone.title || milestone.year) && (
+                            <div className="flex items-center gap-3 mb-2">
+                              {milestone.year && (
+                                <div
+                                  className="font-bold shrink-0 text-left"
+                                  style={{ color: styles.timelineTitleColor, fontSize: styles.timelineTitleSize }}
+                                >
+                                  {milestone.year}
+                                </div>
+                              )}
+                              {milestone.title && (
+                                <h3
+                                  className="font-semibold flex-1 text-center"
+                                  style={{ color: styles.timelineTitleColor, fontSize: styles.timelineTitleSize }}
+                                >
+                                  {milestone.title}
+                                </h3>
+                              )}
+                            </div>
+                          )}
+                          {milestone.description && (
+                            <p className="leading-relaxed" style={{ color: styles.timelineTextColor, fontSize: styles.timelineTextSize }}>
+                              {milestone.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {hasCTA && (
+          <div className={`text-center mt-8 transition-all duration-700 delay-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}>
+            <button
+              onClick={() => scrollToElement(ctaTarget)}
+              className="ctm-btn--primary btn-3d inline-flex items-center gap-2 rounded-xl"
+              style={{
+                backgroundColor: styles.ctaBg,
+                color: styles.ctaTextColor,
+                fontSize: styles.ctaSize,
+                border: styles.ctaBorder || undefined,
+                padding: "0.65rem 1.4rem"
+              }}
+            >
+              <span className="relative z-10">{config.history_cta_text}</span>
+              <ArrowRight className="w-4 h-4 relative z-10" style={{ color: styles.ctaTextColor }} />
+            </button>
+          </div>
+        )}
+      </div>
     </section>
   );
 };

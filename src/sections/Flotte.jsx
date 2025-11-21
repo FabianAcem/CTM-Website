@@ -1,11 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Truck, Users, Package, MapPin, ArrowRight } from 'lucide-react';
 import { useScrollAnimation, useStaggeredAnimation, slideInClasses, scrollToElement } from "../utils/animations.js";
-import { useSection } from "../hooks/useWordPressData.js";
 import { getIcon } from "../utils/icon-manager.js";
 
-const FleetSection = () => {
-  const fleetData = useSection('fleet');
+const FLEET_FALLBACK = {
+  title: "Unsere Flotte",
+  subtitle: "Moderne, umweltfreundliche Fahrzeugflotte für alle Transportbedürfnisse",
+  stats: [
+    { label: "LKW im Einsatz", target: 20, icon: "Truck", sublabel: "davon 6 Spezial" },
+    { label: "Fahrer:innen", target: 28, icon: "Users", sublabel: "fest angestellt" },
+    { label: "Container pro Jahr", target: 1200, icon: "Package", sublabel: "Europaweit" },
+    { label: "Hubs", target: 4, icon: "MapPin", sublabel: "Rhein-Main" }
+  ],
+  vehicle_types: [
+    {
+      title: "Standard Container Trucks",
+      description: "Die zuverlässige Basis für unsere täglichen Einsätze",
+      features: ["24 Fahrzeuge", "GPS-Tracking", "Euro 6"],
+    },
+    {
+      title: "Spezial Transporte",
+      description: "Ausgelegt für Überhöhe und Schwerlast",
+      features: ["12 Fahrzeuge", "Pilotfahrzeuge", "Genehmigungsservice"],
+    }
+  ],
+};
+
+const FleetSection = ({ data }) => {
+  const fleetData = { ...FLEET_FALLBACK, ...(data || {}) };
   const [sectionRef, isVisible] = useScrollAnimation({ threshold: 0.2 });
   const [statsRef, visibleStats] = useStaggeredAnimation(4, 200);
   const [detailsRef, visibleDetails] = useStaggeredAnimation(3, 300);
@@ -13,7 +35,7 @@ const FleetSection = () => {
   const [counters, setCounters] = useState({});
 
   // WordPress-editierbare Stats
-  const stats = fleetData.stats || [];
+  const stats = useMemo(() => fleetData?.stats || [], [fleetData]);
   
   useEffect(() => {
     if (isVisible && stats.length > 0) {
@@ -46,14 +68,14 @@ const FleetSection = () => {
     <section 
       id="fleet" 
       ref={sectionRef}
-      className="min-h-screen flex items-center relative overflow-hidden text-white"
+      className="viewport-section relative overflow-hidden text-white"
     >
-      <div className="container mx-auto px-6 max-w-7xl w-full">
+      <div className="container mx-auto px-6 max-w-7xl w-full h-full flex flex-col justify-center">
         {/* Section Title mit glasmorphism */}
-        <div className={`text-center mb-10 lg:mb-12 ${slideInClasses.fromLeft.transition} ${
+        <div className={`section-header text-center mb-8 ${slideInClasses.fromLeft.transition} ${
           isVisible ? slideInClasses.fromLeft.visible : slideInClasses.fromLeft.hidden
         }`}>
-          <div className="mb-8 hover-tilt transform-3d border border-white/12 rounded-2xl backdrop-blur-md bg-white/5 shadow-lg shadow-black/10 py-6 card-padding-x">
+          <div className="hover-tilt transform-3d border border-white/12 rounded-2xl backdrop-blur-md bg-white/5 shadow-lg shadow-black/10 py-6 card-padding-x">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-yellow-ctm mb-3">
               {fleetData.title || "Unsere Flotte"}
             </h2>
@@ -64,7 +86,7 @@ const FleetSection = () => {
         </div>
 
         {/* Kompakte Statistics Grid - alle 4 Kacheln durchsichtig */}
-        <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-8">
+        <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-4">
           {stats.filter(stat => stat.visible !== false).map((stat, index) => (
             <div 
               key={stat.label}

@@ -22,6 +22,15 @@
   --space-6: calc(2rem    * var(--scale));
   --section-y: clamp(2.5rem, 6vw, calc(5rem * var(--scale)));
 
+  /* Viewport Heights - Modern CSS für Full-Page Sections */
+  --viewport-height: 100vh;
+  --dynamic-viewport-height: 100dvh; /* Dynamic Viewport Height for mobile browsers */
+  --small-viewport-height: 100svh;   /* Small Viewport Height */
+  --large-viewport-height: 100lvh;   /* Large Viewport Height */
+  
+  /* Header Dimensions */
+  --header-height: 100px; /* Fixed Header Height incl. padding */
+
   /* Modern Radius System */
   --radius-sm: 8px;
   --radius: 16px;
@@ -123,6 +132,78 @@ a {
    Modern Glass & 3D Components
    =============================== */
 @layer utilities {
+  /* Normal Section System */
+  .viewport-container {
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    /* Performance optimizations */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  
+  /* Hide scrollbar for Webkit browsers */
+  .viewport-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .viewport-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-top: calc(var(--header-height) + 3rem); /* Mehr Abstand zum Header */
+    padding-bottom: 2rem;
+    box-sizing: border-box;
+    /* Ensure titles are not covered by fixed header */
+    scroll-margin-top: var(--header-height);
+    /* Ensure sections are above background animations */
+    z-index: 10;
+  }
+  
+  /* Hero Section - Full viewport with no header spacing */
+  .viewport-section.hero-section {
+    padding-top: var(--header-height); /* Nur Header-Höhe, kein zusätzlicher Abstand */
+    padding-bottom: 0;
+    scroll-margin-top: 0;
+    min-height: 100vh;
+  }
+  
+  /* Section titles should have proper spacing from header */
+  .viewport-section h1,
+  .viewport-section h2,
+  .viewport-section h3 {
+    scroll-margin-top: var(--header-height);
+  }
+  
+  /* Section header that ensures titles are visible */
+  .section-header {
+    padding-top: 1rem; /* Zusätzlicher Abstand für Titel */
+    margin-bottom: 2rem;
+  }
+  /* First element in section should have extra top margin */
+  .viewport-section > div > div:first-child,
+  .viewport-section > div:first-child {
+    margin-top: auto;
+  }
+  
+  /* Fallback für Browser ohne dvh Support */
+  @supports not (height: 100dvh) {
+    .viewport-container,
+    .viewport-section {
+      height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+  }
+  
+  /* Mobile Browser Viewport Fixes */
+  @media screen and (max-width: 768px) {
+    .viewport-section {
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+  }
+
   /* Glasmorphism Base */
   .glass {
     background: var(--glass-bg);
@@ -130,6 +211,8 @@ a {
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     box-shadow: var(--shadow-md);
+    position: relative;
+    z-index: 20;
   }
   
   .glass-weak {
@@ -199,8 +282,36 @@ a {
   }
   
   .btn-3d:active {
-    transform: translateY(0) translateZ(0);
+    transform: translateY(0) translateZ(0) scale(0.96);
     box-shadow: var(--shadow-sm);
+    filter: brightness(0.95);
+  }
+
+  .hero-card-shell {
+    border-radius: 1.5rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.02);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .hero-card-visual {
+    height: clamp(20rem, 40vw, 22.5rem);
+    border-radius: 1.25rem;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+  }
+
+  .hero-card-shell:hover .hero-card-visual {
+    transform: translateY(-0.35rem);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  }
+
+  .hero-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   /* Gradient Text */
@@ -394,6 +505,32 @@ a {
    Enhanced Form Styles
    =============================== */
 @layer base {
+  :where(button) {
+    position: relative;
+    transform: translateZ(0);
+    transition: transform 0.18s ease, filter 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  :where(button)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.16);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+
+  :where(button:active) {
+    transform: scale(0.96);
+    filter: brightness(0.95);
+  }
+
+  :where(button:active)::after {
+    opacity: 0.35;
+  }
+
   input, textarea, select {
     background: var(--glass-bg);
     backdrop-filter: blur(16px);

@@ -1,0 +1,181 @@
+{
+  "key": "group_page_content",
+  "title": "Seiteninhalte (Flexible Content)",
+  "fields": [
+    {
+      "key": "field_page_flexible_content",
+      "label": "Seiteninhalt",
+      "name": "page_content",
+      "type": "flexible_content",
+      "layouts": [
+        // --- LAYOUT 1: HERO SEKTION ---
+        {
+          "key": "layout_hero_section",
+          "name": "hero_section",
+          "label": "1. Hero Sektion (Start)",
+          "display": "block",
+          "sub_fields": [
+            // TAB 1: Inhalte
+            { "key": "field_hero_content_tab", "label": "Inhalte", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_hero_tagline", "label": "Tagline (Oberer Text)", "name": "tagline", "type": "text", "default_value": "Container Transport Mainz", "wrapper": { "width": "50" } },
+            { "key": "field_hero_headline", "label": "Titel (H1)", "name": "headline", "type": "textarea", "rows": 2, "default_value": "Containerlogistik mit Fokus auf Tempo, Transparenz...", "instructions": "Der Haupttitel der Seite." },
+            { "key": "field_hero_subtext", "label": "Untertext", "name": "subtext", "type": "textarea", "rows": 3, "default_value": "Wir sichern Ihren Containerlauf...", "instructions": "Kurze Einleitung unter dem Titel." },
+            { "key": "field_hero_footer_text", "label": "Fußzeile (Kleiner Text unten)", "name": "footer_text", "type": "text", "default_value": "24/7 Dispo erreichbar · Live Tracking inklusive" },
+
+            // TAB 2: Buttons
+            { "key": "field_hero_buttons_tab", "label": "Buttons", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_hero_main_button", "label": "Haupt-Button", "name": "main_button", "type": "group",
+              "sub_fields": [
+                { "key": "field_main_button_text", "label": "Text", "name": "text", "type": "text", "default_value": "Angebot anfordern", "wrapper": { "width": "50" } },
+                { "key": "field_main_button_link_to", "label": "Link-ID", "name": "link_to", "type": "text", "instructions": "CSS ID zum Scrollen (z.B. 'kontakt').", "wrapper": { "width": "50" } }
+              ]
+            },
+            {
+              "key": "field_hero_secondary_button", "label": "Sekundär-Button", "name": "secondary_button", "type": "group",
+              "sub_fields": [
+                { "key": "field_secondary_button_text", "label": "Text", "name": "text", "type": "text", "default_value": "Leistungen entdecken", "wrapper": { "width": "50" } },
+                { "key": "field_secondary_button_link_to", "label": "Link-ID", "name": "link_to", "type": "text", "instructions": "CSS ID zum Scrollen (z.B. 'services').", "wrapper": { "width": "50" } }
+              ]
+            },
+
+            // TAB 3: Highlight Kacheln
+            { "key": "field_hero_cards_tab", "label": "Highlight Kacheln", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_hero_highlight_cards", "label": "Kartenliste", "name": "highlight_cards", "type": "repeater", "min": 1, "max": 3, "layout": "row", "button_label": "Highlight Karte hinzufügen",
+              "sub_fields": [
+                { "key": "field_card_icon", "label": "Icon (Luicide Name)", "name": "icon_name", "type": "text", "instructions": "Name des Lucide-Icons (z.B. Truck)", "wrapper": { "width": "30" } },
+                { "key": "field_card_title", "label": "Titel", "name": "title", "type": "text", "wrapper": { "width": "30" } },
+                { "key": "field_card_description", "label": "Beschreibung", "name": "description", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } }
+              ]
+            }
+          ]
+        },
+
+        // --- LAYOUT 2: LEISTUNGEN SEKTION ---
+        {
+          "key": "layout_services_section",
+          "name": "services_section",
+          "label": "2. Sektion: Unsere Leistungen",
+          "display": "block",
+          "sub_fields": [
+            // TAB 1: Sektionseinstellungen
+            { "key": "field_services_settings_tab", "label": "Sektionseinstellungen", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_services_title", "label": "Sektions-Titel", "name": "section_title", "type": "text", "default_value": "Unsere Leistungen" },
+            { "key": "field_services_intro", "label": "Einleitungstext", "name": "section_intro", "type": "textarea", "rows": 3 },
+
+            // TAB 2: Leistungs-Kacheln
+            { "key": "field_services_cards_tab", "label": "Leistungs-Kacheln", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_service_cards", "label": "Liste der Leistungs-Kacheln", "name": "service_cards", "type": "repeater", "min": 1, "layout": "table", "button_label": "Leistung hinzufügen",
+              "sub_fields": [
+                { "key": "field_service_card_icon", "label": "Icon (Luicide Name)", "name": "icon_name", "type": "text", "instructions": "Name des Lucide-Icons (z.B. Plane)", "wrapper": { "width": "15" } },
+                { "key": "field_service_card_title", "label": "Titel der Leistung", "name": "title", "type": "text", "wrapper": { "width": "25" } },
+                { "key": "field_service_card_description", "label": "Beschreibung", "name": "description", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } },
+                { "key": "field_service_card_link", "label": "Detail-Link", "name": "link", "type": "url", "wrapper": { "width": "20" } }
+              ]
+            }
+          ]
+        },
+
+        // --- LAYOUT 3: FLOTTE SEKTION ---
+        {
+          "key": "layout_fleet_section",
+          "name": "fleet_section",
+          "label": "3. Sektion: Flotte",
+          "display": "block",
+          "sub_fields": [
+            // TAB 1: Einstellungen
+            { "key": "field_fleet_settings_tab", "label": "Sektionseinstellungen", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_fleet_title", "label": "Sektions-Titel", "name": "section_title", "type": "text", "default_value": "Unsere moderne Flotte" },
+            { "key": "field_fleet_intro", "label": "Einleitungstext", "name": "section_intro", "type": "textarea", "rows": 3 },
+
+            // TAB 2: Fahrzeuge
+            { "key": "field_fleet_vehicles_tab", "label": "Fahrzeuge", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_fleet_vehicles", "label": "Liste der Fahrzeuge", "name": "vehicles", "type": "repeater", "min": 1, "layout": "row", "button_label": "Fahrzeug hinzufügen",
+              "sub_fields": [
+                { "key": "field_vehicle_image", "label": "Fahrzeugbild", "name": "image", "type": "image" },
+                { "key": "field_vehicle_title", "label": "Fahrzeugtyp", "name": "title", "type": "text" },
+                { "key": "field_vehicle_description", "label": "Beschreibung", "name": "description", "type": "textarea", "rows": 2 },
+                {
+                  "key": "field_vehicle_specs", "label": "Technische Details", "name": "specs", "type": "repeater", "layout": "table", "button_label": "Detail hinzufügen",
+                  "sub_fields": [
+                    { "key": "field_spec_label", "label": "Eigenschaft", "name": "label", "type": "text", "wrapper": { "width": "50" } },
+                    { "key": "field_spec_value", "label": "Wert", "name": "value", "type": "text", "wrapper": { "width": "50" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+
+        // --- LAYOUT 4: GESCHICHTE SEKTION ---
+        {
+          "key": "layout_history_section",
+          "name": "history_section",
+          "label": "4. Sektion: Geschichte",
+          "display": "block",
+          "sub_fields": [
+            // TAB 1: Einstellungen
+            { "key": "field_history_settings_tab", "label": "Sektionseinstellungen", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_history_title", "label": "Sektions-Titel", "name": "section_title", "type": "text", "default_value": "Unsere Geschichte & Meilensteine" },
+            { "key": "field_history_intro", "label": "Einleitungstext", "name": "section_intro", "type": "textarea", "rows": 3 },
+
+            // TAB 2: Zeitleiste
+            { "key": "field_history_timeline_tab", "label": "Zeitleiste", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_history_milestones", "label": "Meilensteine", "name": "milestones", "type": "repeater", "min": 1, "layout": "row", "button_label": "Meilenstein hinzufügen",
+              "sub_fields": [
+                { "key": "field_milestone_year", "label": "Jahr", "name": "year", "type": "text", "wrapper": { "width": "15" } },
+                { "key": "field_milestone_title", "label": "Titel des Ereignisses", "name": "title", "type": "text", "wrapper": { "width": "35" } },
+                { "key": "field_milestone_description", "label": "Beschreibung", "name": "description", "type": "textarea", "rows": 2, "wrapper": { "width": "50" } }
+              ]
+            }
+          ]
+        },
+
+        // --- LAYOUT 5: KONTAKT SEKTION ---
+        {
+          "key": "layout_contact_section",
+          "name": "contact_section",
+          "label": "5. Sektion: Kontakt",
+          "display": "block",
+          "sub_fields": [
+            // TAB 1: Text & Formular
+            { "key": "field_contact_text_tab", "label": "Text & Formular", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_contact_title", "label": "Sektions-Titel", "name": "section_title", "type": "text", "default_value": "Jetzt Angebot anfordern" },
+            { "key": "field_contact_intro", "label": "Einleitungstext", "name": "section_intro", "type": "textarea", "rows": 3, "instructions": "Text über dem Kontaktformular." },
+            { "key": "field_contact_form_id", "label": "Formular-Shortcode/ID", "name": "form_id", "type": "text", "instructions": "Shortcode oder ID des Kontaktformulars (z.B. [contact-form-7 id=\"123\"])." },
+
+            // TAB 2: Kontaktdaten
+            { "key": "field_contact_details_tab", "label": "Kontaktdaten", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_contact_items", "label": "Kontakt-Elemente", "name": "contact_items", "type": "repeater", "min": 1, "layout": "table", "button_label": "Element hinzufügen",
+              "sub_fields": [
+                { "key": "field_contact_type", "label": "Typ", "name": "type", "type": "select", "choices": { "phone": "Telefon", "email": "E-Mail", "address": "Adresse" }, "default_value": "phone", "wrapper": { "width": "30" } },
+                { "key": "field_contact_label", "label": "Label (z.B. Disposition)", "name": "label", "type": "text", "wrapper": { "width": "30" } },
+                { "key": "field_contact_value", "label": "Wert (z.B. +49 123 4567)", "name": "value", "type": "text", "wrapper": { "width": "40" } }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "location": [
+    [
+      {
+        "param": "post_type",
+        "operator": "==",
+        "value": "page"
+      }
+    ]
+  ],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "seamless",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true
+}

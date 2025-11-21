@@ -11,7 +11,7 @@ export default function Footer() {
           </span>
         </div>
         <div className="text-white/60 text-xs">
-          <span className="text-gradient">Glasmorphism Design</span> · Mainz, Deutschland
+          <span className="text-gradient">· Mainz, Deutschland</span>
         </div>
       </div>
       

@@ -1,0 +1,266 @@
+{
+  "key": "group_page_content",
+  "title": "Seiteninhalte (Flexible Content)",
+  "fields": [
+    {
+      "key": "field_page_flexible_content",
+      "label": "Seiteninhalt",
+      "name": "page_content",
+      "type": "flexible_content",
+      "layouts": [
+        // --- LAYOUT 1: HERO SEKTION (wie zuvor, da korrekt) ---
+        {
+          "key": "layout_hero_section",
+          "name": "hero_section",
+          "label": "1. Hero Sektion (Start)",
+          "display": "block",
+          "sub_fields": [
+            { "key": "field_hero_content_tab", "label": "Inhalte", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_hero_tagline", "label": "Tagline (Oberer Text)", "name": "tagline", "type": "text", "wrapper": { "width": "50" } },
+            { "key": "field_hero_headline", "label": "Titel (H1)", "name": "headline", "type": "textarea", "rows": 2 },
+            { "key": "field_hero_subtext", "label": "Untertext", "name": "subtext", "type": "textarea", "rows": 3 },
+            { "key": "field_hero_footer_text", "label": "Fußzeile (Kleiner Text unten)", "name": "footer_text", "type": "text" },
+            { "key": "field_hero_buttons_tab", "label": "Buttons", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_hero_main_button", "label": "Haupt-Button", "name": "main_button", "type": "group",
+              "sub_fields": [
+                { "key": "field_main_button_text", "label": "Text", "name": "text", "type": "text", "wrapper": { "width": "50" } },
+                { "key": "field_main_button_link_to", "label": "Link-ID", "name": "link_to", "type": "text", "instructions": "CSS ID zum Scrollen (z.B. 'kontakt').", "wrapper": { "width": "50" } }
+              ]
+            },
+            {
+              "key": "field_hero_secondary_button", "label": "Sekundär-Button", "name": "secondary_button", "type": "group",
+              "sub_fields": [
+                { "key": "field_secondary_button_text", "label": "Text", "name": "text", "type": "text", "wrapper": { "width": "50" } },
+                { "key": "field_secondary_button_link_to", "label": "Link-ID", "name": "link_to", "type": "text", "instructions": "CSS ID zum Scrollen (z.B. 'services').", "wrapper": { "width": "50" } }
+              ]
+            },
+            { "key": "field_hero_cards_tab", "label": "Highlight Kacheln", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_hero_highlight_cards", "label": "Kartenliste", "name": "highlight_cards", "type": "repeater", "min": 1, "max": 3, "layout": "row", "button_label": "Highlight Karte hinzufügen",
+              "sub_fields": [
+                { "key": "field_card_icon", "label": "Icon (Luicide Name)", "name": "icon_name", "type": "text", "wrapper": { "width": "30" } },
+                { "key": "field_card_title", "label": "Titel", "name": "title", "type": "text", "wrapper": { "width": "30" } },
+                { "key": "field_card_description", "label": "Beschreibung", "name": "description", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } }
+              ]
+            }
+          ]
+        },
+
+        // --- LAYOUT 2: LEISTUNGEN SEKTION (mit zusätzlichen Feldern aus dem Code) ---
+        {
+          "key": "layout_services_section",
+          "name": "services_section",
+          "label": "2. Sektion: Unsere Leistungen",
+          "display": "block",
+          "sub_fields": [
+            { "key": "field_services_settings_tab", "label": "Sektionseinstellungen", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_services_title", "label": "Sektions-Titel", "name": "title", "type": "text" },
+            { "key": "field_services_subtitle", "label": "Einleitungstext/Untertitel", "name": "subtitle", "type": "textarea", "rows": 2 },
+            
+            // Container Details aus der Animation
+            { "key": "field_service_payload", "label": "Container Nutzlast (z.B. 28t)", "name": "payload", "type": "text", "wrapper": { "width": "33.33" } },
+            // Service Highlights aus dem Code (24/7 Tracking, 99.2% Pünktlich, 5 Mio EUR Vers.)
+            { "key": "field_service_highlight_1", "label": "Highlight 1 (z.B. 24/7 Tracking)", "name": "highlight_1", "type": "text", "wrapper": { "width": "33.33" } },
+            { "key": "field_service_highlight_2", "label": "Highlight 2 (z.B. 99.2% Pünktlich)", "name": "highlight_2", "type": "text", "wrapper": { "width": "33.33" } },
+            { "key": "field_service_highlight_3", "label": "Highlight 3 (z.B. 5 Mio EUR Vers.)", "name": "highlight_3", "type": "text" },
+            
+            // CTA Button (Am Ende der Sektion)
+            { "key": "field_services_cta", "label": "Sektions-CTA", "name": "cta", "type": "group",
+              "sub_fields": [
+                { "key": "field_services_cta_text", "label": "CTA Text", "name": "text", "type": "text", "wrapper": { "width": "50" } },
+                { "key": "field_services_cta_href", "label": "CTA Link-ID", "name": "href", "type": "text", "wrapper": { "width": "50" } }
+              ]
+            },
+
+            { "key": "field_services_cards_tab", "label": "Leistungs-Kacheln", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_service_cards", "label": "Liste der Leistungs-Kacheln (items)", "name": "items", "type": "repeater", "min": 1, "layout": "row", "button_label": "Leistung hinzufügen",
+              "sub_fields": [
+                { "key": "field_service_card_icon", "label": "Icon", "name": "icon", "type": "text", "wrapper": { "width": "20" } },
+                { "key": "field_service_card_title", "label": "Titel", "name": "title", "type": "text", "wrapper": { "width": "30" } },
+                { "key": "field_service_card_description", "label": "Beschreibung", "name": "description", "type": "textarea", "rows": 2, "wrapper": { "width": "30" } },
+                { "key": "field_service_card_highlight", "label": "Highlight Text", "name": "highlight", "type": "text", "wrapper": { "width": "20" } } // highlight-Feld hinzugefügt
+              ]
+            }
+          ]
+        },
+
+        // --- LAYOUT 3: FLOTTE SEKTION (mit Stats und Details aus dem Code) ---
+        {
+          "key": "layout_fleet_section",
+          "name": "fleet_section",
+          "label": "3. Sektion: Flotte",
+          "display": "block",
+          "sub_fields": [
+            { "key": "field_fleet_settings_tab", "label": "Sektionseinstellungen", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_fleet_title", "label": "Sektions-Titel", "name": "title", "type": "text" },
+            { "key": "field_fleet_subtitle", "label": "Untertitel", "name": "subtitle", "type": "textarea", "rows": 2 },
+            
+            // CTA Button
+            { "key": "field_fleet_cta", "label": "Sektions-CTA", "name": "cta", "type": "group",
+              "sub_fields": [
+                { "key": "field_fleet_cta_text", "label": "CTA Text", "name": "text", "type": "text", "wrapper": { "width": "50" } },
+                { "key": "field_fleet_cta_href", "label": "CTA Link-ID", "name": "href", "type": "text", "wrapper": { "width": "50" } }
+              ]
+            },
+
+            // Stats (Kompakte Statistics Grid)
+            { "key": "field_fleet_stats_tab", "label": "Statistiken", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_fleet_stats", "label": "Statistik-Kacheln (stats)", "name": "stats", "type": "repeater", "min": 1, "layout": "table", "button_label": "Statistik hinzufügen",
+              "sub_fields": [
+                { "key": "field_stat_icon", "label": "Icon", "name": "icon", "type": "text", "wrapper": { "width": "20" } },
+                { "key": "field_stat_label", "label": "Label", "name": "label", "type": "text", "wrapper": { "width": "30" } },
+                { "key": "field_stat_sublabel", "label": "Sublabel", "name": "sublabel", "type": "text", "wrapper": { "width": "20" } },
+                { "key": "field_stat_target", "label": "Ziel-Wert (für Animation)", "name": "target", "type": "number", "wrapper": { "width": "15" } },
+                { "key": "field_stat_suffix", "label": "Suffix (z.B. +)", "name": "suffix", "type": "text", "wrapper": { "width": "15" } }
+              ]
+            },
+
+            // Fahrzeugdetails (Fleet Details)
+            { "key": "field_fleet_details_tab", "label": "Fahrzeug-Details", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_fleet_vehicle_types", "label": "Fahrzeugtypen (vehicle_types)", "name": "vehicle_types", "type": "repeater", "min": 1, "layout": "row", "button_label": "Typ hinzufügen",
+              "sub_fields": [
+                { "key": "field_vehicle_type_title", "label": "Titel", "name": "title", "type": "text" },
+                { "key": "field_vehicle_type_features", "label": "Eigenschaften (features)", "name": "features", "type": "repeater", "layout": "table", "sub_fields": [
+                    { "key": "field_feature_text", "label": "Feature", "name": "feature", "type": "text" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+
+        // --- LAYOUT 4: GESCHICHTE SEKTION (mit Stats und Values aus dem Code) ---
+        {
+          "key": "layout_history_section",
+          "name": "history_section",
+          "label": "4. Sektion: Geschichte",
+          "display": "block",
+          "sub_fields": [
+            { "key": "field_history_settings_tab", "label": "Sektionseinstellungen", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_history_title", "label": "Sektions-Titel", "name": "title", "type": "text" },
+            { "key": "field_history_subtitle", "label": "Untertitel", "name": "subtitle", "type": "textarea", "rows": 2 },
+            { "key": "field_history_content", "label": "Haupttext (Content)", "name": "content", "type": "wysiwyg" }, // Für den Haupttext mit Formatierung
+
+            // Werte (Values List)
+            { "key": "field_history_values_tab", "label": "Werte & Stats", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_history_stats", "label": "Statistik-Kacheln (stats)", "name": "stats", "type": "repeater", "layout": "table", "button_label": "Statistik hinzufügen",
+              "sub_fields": [
+                { "key": "field_history_stat_number", "label": "Zahl", "name": "number", "type": "text", "wrapper": { "width": "30" } },
+                { "key": "field_history_stat_label", "label": "Label", "name": "label", "type": "text", "wrapper": { "width": "70" } }
+              ]
+            },
+            {
+              "key": "field_history_values", "label": "Werte Liste (values)", "name": "values", "type": "repeater", "layout": "table", "button_label": "Wert hinzufügen",
+              "sub_fields": [
+                { "key": "field_value_text", "label": "Text", "name": "text", "type": "text" }
+              ]
+            },
+
+            // Zeitleiste (Timeline)
+            { "key": "field_history_timeline_tab", "label": "Zeitleiste", "name": "", "type": "tab", "placement": "top" },
+            {
+              "key": "field_history_timeline", "label": "Meilensteine (timeline)", "name": "timeline", "type": "repeater", "min": 1, "layout": "row", "button_label": "Meilenstein hinzufügen",
+              "sub_fields": [
+                { "key": "field_milestone_icon", "label": "Icon", "name": "icon", "type": "text", "wrapper": { "width": "15" } },
+                { "key": "field_milestone_year", "label": "Jahr", "name": "year", "type": "text", "wrapper": { "width": "15" } },
+                { "key": "field_milestone_title", "label": "Titel", "name": "title", "type": "text", "wrapper": { "width": "30" } },
+                { "key": "field_milestone_description", "label": "Beschreibung", "name": "description", "type": "textarea", "rows": 2, "wrapper": { "width": "40" } }
+              ]
+            }
+          ]
+        },
+
+        // --- LAYOUT 5: KONTAKT SEKTION (mit allen Details aus dem Code) ---
+        {
+          "key": "layout_contact_section",
+          "name": "contact_section",
+          "label": "5. Sektion: Kontakt",
+          "display": "block",
+          "sub_fields": [
+            { "key": "field_contact_text_tab", "label": "Titel & Formular", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_contact_title", "label": "Sektions-Titel", "name": "title", "type": "text" },
+            { "key": "field_contact_subtitle", "label": "Untertitel", "name": "subtitle", "type": "textarea", "rows": 2 },
+            
+            // Formular-Details
+            { "key": "field_contact_form_group", "label": "Formular-Einstellungen", "name": "form", "type": "group", "sub_fields": [
+                { "key": "field_form_success_title", "label": "Erfolgs-Titel", "name": "successTitle", "type": "text" },
+                { "key": "field_form_success_message", "label": "Erfolgs-Nachricht", "name": "successMessage", "type": "textarea", "rows": 2 },
+                { "key": "field_form_error_message", "label": "Fehler-Nachricht", "name": "errorMessage", "type": "textarea", "rows": 2 },
+                { "key": "field_form_submit_label", "label": "Senden-Label", "name": "submitLabel", "type": "text" },
+                { "key": "field_form_privacy_notice", "label": "Datenschutz-Hinweis", "name": "privacyNotice", "type": "textarea", "rows": 2 }
+              ]
+            },
+            
+            // Kontaktdaten
+            { "key": "field_contact_details_tab", "label": "Kontaktdaten", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_contact_recipient", "label": "Haupt-Empfänger E-Mail", "name": "recipient", "type": "email", "instructions": "Standard-Empfänger für das Formular." },
+            { "key": "field_contact_cc", "label": "CC E-Mail", "name": "cc", "type": "email" },
+            
+            { "key": "field_contact_address_group", "label": "Adresse", "name": "address_group", "type": "group", "sub_fields": [
+                { "key": "field_address_label", "label": "Label (z.B. Zentrale)", "name": "label", "type": "text" },
+                { "key": "field_address_lines", "label": "Adresszeilen (lines)", "name": "lines", "type": "repeater", "layout": "table", "button_label": "Zeile hinzufügen", "sub_fields": [
+                    { "key": "field_address_line_text", "label": "Text", "name": "text", "type": "text" }
+                  ]
+                }
+              ]
+            },
+            { "key": "field_contact_phones", "label": "Telefonnummern (phones)", "name": "phones", "type": "repeater", "layout": "table", "button_label": "Nummer hinzufügen",
+              "sub_fields": [
+                { "key": "field_phone_label", "label": "Label", "name": "label", "type": "text", "wrapper": { "width": "40" } },
+                { "key": "field_phone_number", "label": "Nummer", "name": "number", "type": "text", "wrapper": { "width": "60" } }
+              ]
+            },
+            { "key": "field_contact_emails", "label": "E-Mail-Adressen (emails)", "name": "emails", "type": "repeater", "layout": "table", "button_label": "E-Mail hinzufügen",
+              "sub_fields": [
+                { "key": "field_email_label", "label": "Label", "name": "label", "type": "text", "wrapper": { "width": "40" } },
+                { "key": "field_email_address", "label": "Adresse", "name": "address", "type": "email", "wrapper": { "width": "60" } }
+              ]
+            },
+
+            // Öffnungszeiten & Verfügbarkeit
+            { "key": "field_contact_hours_tab", "label": "Öffnungszeiten & Impr.", "name": "", "type": "tab", "placement": "top" },
+            { "key": "field_contact_office_hours", "label": "Öffnungszeiten (officeHours)", "name": "officeHours", "type": "repeater", "layout": "table", "button_label": "Zeile hinzufügen",
+              "sub_fields": [
+                { "key": "field_hour_day", "label": "Tag", "name": "day", "type": "text", "wrapper": { "width": "50" } },
+                { "key": "field_hour_time", "label": "Zeit", "name": "time", "type": "text", "wrapper": { "width": "50" } }
+              ]
+            },
+            { "key": "field_contact_availability", "label": "Verfügbarkeit", "name": "availability", "type": "group", "sub_fields": [
+                { "key": "field_availability_label", "label": "Label (z.B. 24/7 Dispo)", "name": "label", "type": "text", "wrapper": { "width": "50" } },
+                { "key": "field_availability_status", "label": "Status (z.B. Erreichbar)", "name": "status", "type": "text", "wrapper": { "width": "50" } }
+              ]
+            },
+            
+            // Impressum
+            { "key": "field_contact_imprint", "label": "Impressum (imprint)", "name": "imprint", "type": "repeater", "layout": "table", "button_label": "Eintrag hinzufügen",
+              "sub_fields": [
+                { "key": "field_imprint_label", "label": "Label", "name": "label", "type": "text", "wrapper": { "width": "40" } },
+                { "key": "field_imprint_value", "label": "Wert", "name": "value", "type": "textarea", "rows": 2, "wrapper": { "width": "60" } }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "location": [
+    [
+      {
+        "param": "post_type",
+        "operator": "==",
+        "value": "page"
+      }
+    ]
+  ],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "seamless",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true
+}

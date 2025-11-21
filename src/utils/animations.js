@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from 'react';
  * @param {Object} options - Intersection Observer Optionen
  * @returns {[ref, isVisible]} - Ref für Element und Sichtbarkeitsstatus
  */
-export function useScrollAnimation(options = {}) {
+export function useScrollAnimation({ threshold = 0.1, rootMargin = '-50px 0px', root = null } = {}) {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
 
@@ -18,9 +18,9 @@ export function useScrollAnimation(options = {}) {
         setIsVisible(entry.isIntersecting);
       },
       {
-        threshold: 0.1,
-        rootMargin: '-50px 0px',
-        ...options,
+        threshold,
+        rootMargin,
+        root,
       }
     );
 
@@ -29,7 +29,7 @@ export function useScrollAnimation(options = {}) {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [threshold, rootMargin, root]);
 
   return [ref, isVisible];
 }
@@ -40,10 +40,23 @@ export function useScrollAnimation(options = {}) {
  * @param {number} delay - Verzögerung zwischen Items in ms
  * @returns {[ref, visibleItems]} - Ref für Container und Array der sichtbaren Items
  */
-export function useStaggeredAnimation(itemCount, delay = 150) {
-  const [isVisible, setIsVisible] = useState(false);
+export function useStaggeredAnimation(itemCount, delay = 150, options = {}) {
+  const {
+    rootMargin = '-50px 0px',
+    threshold = 0.1,
+    once = false,
+    startDelay = 0
+  } = options;
+
   const [visibleItems, setVisibleItems] = useState([]);
+  const [triggerId, setTriggerId] = useState(0);
   const ref = useRef(null);
+  const timersRef = useRef([]);
+
+  const clearTimers = () => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+  };
 
   useEffect(() => {
     const element = ref.current;
@@ -51,29 +64,41 @@ export function useStaggeredAnimation(itemCount, delay = 150) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          setTriggerId(prev => prev + 1);
+        } else if (!once) {
+          clearTimers();
+          setVisibleItems([]);
+        }
       },
-      { threshold: 0.1, rootMargin: '-50px 0px' }
+      { threshold, rootMargin }
     );
 
     observer.observe(element);
 
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      clearTimers();
+      observer.disconnect();
+    };
+  }, [threshold, rootMargin, once]);
 
   useEffect(() => {
-    if (isVisible) {
-      // Items gestaffelt sichtbar machen
-      for (let i = 0; i < itemCount; i++) {
-        setTimeout(() => {
-          setVisibleItems(prev => [...prev, i]);
-        }, i * delay);
-      }
-    } else {
-      // Reset wenn nicht mehr sichtbar
+    clearTimers();
+
+    if (!itemCount || triggerId === 0) {
       setVisibleItems([]);
+      return () => clearTimers();
     }
-  }, [isVisible, itemCount, delay]);
+
+    for (let i = 0; i < itemCount; i++) {
+      const timer = setTimeout(() => {
+        setVisibleItems(prev => (prev.includes(i) ? prev : [...prev, i]));
+      }, startDelay + i * delay);
+      timersRef.current.push(timer);
+    }
+
+    return () => clearTimers();
+  }, [triggerId, itemCount, delay, startDelay]);
 
   return [ref, visibleItems];
 }
